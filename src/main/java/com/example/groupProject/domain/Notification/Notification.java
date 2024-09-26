@@ -1,5 +1,6 @@
 package com.example.groupProject.domain.Notification;
 
+import com.example.groupProject.domain.Memo.Memo;
 import com.example.groupProject.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -22,13 +23,17 @@ public class Notification {
 
     private String content; //웹 푸시 내용
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_user_id")
     private User senderUser; // 알림을 보낸 사용자
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_user_id")
     private User receiverUser; // 알림을 받는 사용자
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "notification_memo_id")
+    private Memo notificationMemo;
 
     private String url; // 알림 클릭 시 이동할 URL
 

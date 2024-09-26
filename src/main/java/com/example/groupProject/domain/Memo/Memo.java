@@ -1,5 +1,6 @@
 package com.example.groupProject.domain.Memo;
 
+import com.example.groupProject.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,4 +27,8 @@ public abstract class Memo {
     private String name; //화장품 이름
 
     private String description; //부가 설명
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "master_id")
+    private User master;
 }

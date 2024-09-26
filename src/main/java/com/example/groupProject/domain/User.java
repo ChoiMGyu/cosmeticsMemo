@@ -27,9 +27,10 @@ public class User {
 
     private LocalDate birthdate; //생년월일
 
+    @Enumerated(EnumType.STRING)
     private SkinType skinType; //피부 타입 ex) 건성, 지성, 복합성, 수부지
 
-    private boolean notification_opt; //웹 푸시 알림 허용
+    private boolean notification_opt = false; //웹 푸시 알림 허용
 
     private Sex sex; //성별
 }
