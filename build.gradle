@@ -30,10 +30,15 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.mysql:mysql-connector-j' //개발 환경에서 사용할 DB(MySQL)
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'com.h2database:h2:2.1.214'
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
+
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
