@@ -1,10 +1,9 @@
-package com.example.groupProject.domain;
+package com.example.groupProject.domain.User;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 
@@ -32,7 +31,10 @@ public class User {
 
     private boolean sex; //성별 (남자는 True, 여자는 false)
 
-    public static User createUser(String account, String password, LocalDate birthdate, SkinType skinType, Boolean notification_opt, Boolean sex) {
+    @Enumerated(EnumType.STRING)
+    private RoleType role; //접근 권한
+
+    public static User createUser(String account, String password, LocalDate birthdate, SkinType skinType, Boolean notification_opt, Boolean sex, RoleType role) {
         User user = new User();
         user.initialAccount(account);
         user.initialPassword(password);
@@ -40,6 +42,7 @@ public class User {
         user.initialSkinType(skinType);
         user.initialNotification_opt(notification_opt);
         user.initialSex(sex);
+        user.initialRole(role);
         return user;
     }
 
@@ -66,6 +69,8 @@ public class User {
     private void initialSex(Boolean sex) {
         this.sex = sex;
     }
+
+    private void initialRole(RoleType role) {this.role = role;}
 
     // 패스워드 업데이트 메서드
     public void updatePassword(String encryptedPassword) {

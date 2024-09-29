@@ -1,14 +1,16 @@
 package com.example.groupProject.dto.user;
 
-import com.example.groupProject.domain.SkinType;
+import com.example.groupProject.domain.User.SkinType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
 

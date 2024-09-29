@@ -1,17 +1,17 @@
 package com.example.groupProject.service;
-import com.example.groupProject.domain.SkinType;
-import com.example.groupProject.domain.User;
+import com.example.groupProject.domain.User.RoleType;
+import com.example.groupProject.domain.User.SkinType;
+import com.example.groupProject.domain.User.User;
 import com.example.groupProject.repository.UserRepositoryImpl;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;  // JUnit 5 애너테이션
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.assertj.core.api.Assertions;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Transactional
 public class UserServiceTest {
@@ -39,7 +39,8 @@ public class UserServiceTest {
                 LocalDate.now(),
                 SkinType.DRY,
                 true,
-                true
+                true,
+                RoleType.USER
         );
 
         userService.join(user);
@@ -68,7 +69,8 @@ public class UserServiceTest {
                 LocalDate.now(),
                 SkinType.DRY,
                 true,
-                true
+                true,
+                RoleType.USER
         );
 
         //when

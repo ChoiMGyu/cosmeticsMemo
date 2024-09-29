@@ -1,4 +1,4 @@
-package com.example.groupProject.domain;
+package com.example.groupProject.domain.User;
 
 public enum SkinType {
     DRY, Oily, Combination, Dehydrated_Oily

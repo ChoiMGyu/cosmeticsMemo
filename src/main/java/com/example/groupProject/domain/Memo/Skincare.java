@@ -1,11 +1,7 @@
 package com.example.groupProject.domain.Memo;
 
-import com.example.groupProject.domain.Memo.Memo;
-import com.example.groupProject.domain.SkinType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Getter;
 
 @Entity

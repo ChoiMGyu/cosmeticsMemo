@@ -1,7 +1,7 @@
 package com.example.groupProject.domain.Notification;
 
 import com.example.groupProject.domain.Memo.Memo;
-import com.example.groupProject.domain.User;
+import com.example.groupProject.domain.User.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

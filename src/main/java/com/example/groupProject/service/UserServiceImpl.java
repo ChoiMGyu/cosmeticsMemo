@@ -1,9 +1,9 @@
 package com.example.groupProject.service;
 
-import com.example.groupProject.domain.User;
+import com.example.groupProject.domain.User.User;
 import com.example.groupProject.repository.UserRepositoryImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class UserServiceImpl {
 
     private final UserRepositoryImpl userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
     public Long join(User user) {
@@ -24,7 +24,7 @@ public class UserServiceImpl {
         //패스워드 입력 일치 여부는 컨트롤러에서 검사
         validateDuplicateAccount(user);
 
-        String encryptedPassword = passwordEncoder.encode(user.getPassword());
+        String encryptedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.updatePassword(encryptedPassword);
 
         userRepository.save(user);
