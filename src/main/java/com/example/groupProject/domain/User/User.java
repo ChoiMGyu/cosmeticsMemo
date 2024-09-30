@@ -27,9 +27,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private SkinType skinType; //피부 타입 ex) 건성, 지성, 복합성, 수부지
 
-    private boolean notification_opt = false; //웹 푸시 알림 허용
+    private Boolean notification_opt = false; //웹 푸시 알림 허용
 
-    private boolean sex; //성별 (남자는 True, 여자는 false)
+    private Boolean sex; //성별 (남자는 True, 여자는 false)
 
     @Enumerated(EnumType.STRING)
     private RoleType role; //접근 권한

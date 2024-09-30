@@ -40,7 +40,7 @@ public class UserServiceTest {
                 SkinType.DRY,
                 true,
                 true,
-                RoleType.USER
+                RoleType.ROLE_USER
         );
 
         userService.join(user);
@@ -70,7 +70,7 @@ public class UserServiceTest {
                 SkinType.DRY,
                 true,
                 true,
-                RoleType.USER
+                RoleType.ROLE_USER
         );
 
         //when

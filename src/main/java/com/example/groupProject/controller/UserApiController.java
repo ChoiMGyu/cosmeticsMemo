@@ -35,7 +35,7 @@ public class UserApiController {
                     userDto.getSkinType(),
                     userDto.getNotification_opt(),
                     userDto.getSex(),
-                    RoleType.ADMIN);
+                    RoleType.ROLE_ADMIN);
             Long userId = userService.join(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(userId + ": " + userDto.getAccount() + "의 계정으로 회원 가입 되었습니다.");
         } catch(IllegalStateException e) {
