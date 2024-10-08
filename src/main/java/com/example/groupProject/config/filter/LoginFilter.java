@@ -2,16 +2,17 @@ package com.example.groupProject.config.filter;
 
 
 import com.example.groupProject.config.util.JWTUtil;
-import com.example.groupProject.domain.User.RoleType;
 import com.example.groupProject.domain.User.User;
-import com.example.groupProject.dto.jwt.CustomUserDetails;
+import com.example.groupProject.service.AuthService.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
+    private final JwtService jwtService;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
@@ -44,8 +46,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             // PrincipalDetailsService의 loadUserByUsername() 함수가 실행된 후 정상이면 authentication이 리턴된다.
             // DB에 있는 username과 password가 일치한다.
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
-            System.out.println(user.getAccount());
 
             // => 로그인이 되었다는 뜻. (아래는 확인 차원)
             //CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -63,23 +63,35 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        String account = customUserDetails.getUsername();
+        String account = authentication.getName();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
-
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(account, role, 6000 * 60 * 10L);
+        String access = jwtUtil.createJwt("access", account, role, 600000L);
+        String refresh = jwtUtil.createJwt("refresh", account, role, 2400000L);
 
-        response.addHeader("Authorization", "Bearer " + token);
+        jwtService.addRefresh(account, refresh);
+
+        response.setHeader("access", access);
+        response.addCookie(createCookie("refresh", refresh));
+        response.setStatus(HttpStatus.OK.value());
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         response.setStatus(401);
+    }
+
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(24*60 *60); //쿠키의 생명주기
+        //cookie.setSecure(true); //https 통신을 사용할 경우
+        //cookie.setPath("/"); //쿠키가 적용될 범위
+        cookie.setHttpOnly(true);
+
+        return cookie;
     }
 }

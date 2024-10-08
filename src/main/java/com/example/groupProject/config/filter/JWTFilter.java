@@ -4,6 +4,7 @@ import com.example.groupProject.config.util.JWTUtil;
 import com.example.groupProject.domain.User.RoleType;
 import com.example.groupProject.domain.User.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.management.relation.Role;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
@@ -28,29 +30,39 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorization = request.getHeader("Authorization");
+        String accessToken = request.getHeader("access");
 
-        if(authorization == null || !authorization.startsWith("Bearer ")) {
-            System.out.println("token null");
+        if(accessToken == null) {
+            logger.info("AccessToken이 존재하지 않는 경우");
             filterChain.doFilter(request, response);
-
             return;
         }
 
-        String token = authorization.split(" ")[1];
+        //상태 코드를 반환하여 프론트에서 refresh token 발급 경로로 이동하게끔 한다
+        //클라이언트 측에서 refresh token이 쿠키에 담겨 있을 때 axios와 같은 API Client 사용 시 credential 옵션을 통해 쿠키 전송 여부를 결정할 수 있음
 
-        logger.info("토큰 : " + token);
-        if(jwtUtil.isExpired(token)) {
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
+        try {
+            jwtUtil.isExpired(accessToken);
+        } catch(ExpiredJwtException e) {
+            PrintWriter writer = response.getWriter();
+            writer.print("access token expired");
 
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        String account = jwtUtil.getAccount(token);
-        String role = jwtUtil.getRole(token);
+        String category = jwtUtil.getCategory(accessToken);
 
-        System.out.println("role : " + role + ", valueOf(role) : " +  RoleType.valueOf(role));
+        if(!category.equals("access")) {
+            PrintWriter writer = response.getWriter();
+            writer.print("invalid access token");
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        String account = jwtUtil.getAccount(accessToken);
+        String role = jwtUtil.getRole(accessToken);
 
         User user = User.createUser(account, "temppwd", null, null, null, null, RoleType.valueOf(role));
 

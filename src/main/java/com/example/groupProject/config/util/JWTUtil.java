@@ -1,6 +1,5 @@
 package com.example.groupProject.config.util;
 
-import com.example.groupProject.domain.User.RoleType;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -37,16 +36,15 @@ public class JWTUtil {
     }
 
     //발급
-    public String createJwt(String account, String role, Long expiredMs) {
-        System.out.println("새로운 token 생성");
+    public String createJwt(String category, String account, String role, Long expiredMs) {
         String token =  Jwts.builder()
+                .claim("category", category)
                 .claim("account", account)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
-        System.out.println("token : " + token);
         return token;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.groupProject.service;
+package com.example.groupProject.service.AuthService;
 
 import com.example.groupProject.domain.User.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;

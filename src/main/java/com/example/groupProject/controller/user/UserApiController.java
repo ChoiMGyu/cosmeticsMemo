@@ -1,4 +1,4 @@
-package com.example.groupProject.controller;
+package com.example.groupProject.controller.user;
 
 import com.example.groupProject.domain.User.RoleType;
 import com.example.groupProject.domain.User.User;
@@ -35,7 +35,7 @@ public class UserApiController {
                     userDto.getSkinType(),
                     userDto.getNotification_opt(),
                     userDto.getSex(),
-                    RoleType.ROLE_ADMIN);
+                    RoleType.ROLE_USER);
             Long userId = userService.join(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(userId + ": " + userDto.getAccount() + "의 계정으로 회원 가입 되었습니다.");
         } catch(IllegalStateException e) {
