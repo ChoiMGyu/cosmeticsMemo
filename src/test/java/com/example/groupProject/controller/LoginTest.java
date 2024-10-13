@@ -1,5 +1,8 @@
 package com.example.groupProject.controller;
 
+import com.example.groupProject.domain.User.RoleType;
+import com.example.groupProject.domain.User.User;
+import com.example.groupProject.service.UserServiceImpl;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MockMvcBuilder;
@@ -28,29 +34,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class LoginTest {
 
     @Autowired
-    MockMvc mockMvc;
+    MockMvc mvc;
     @Autowired
     WebApplicationContext context;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    UserServiceImpl userService;
 
 
     @BeforeEach
     public void setUp() {
-        mockMvc = MockMvcBuilders
+        mvc = MockMvcBuilders
                 .webAppContextSetup(this.context)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Access Token 발급 로그인")
     public void 로그인_AccessToken() throws Exception
     {
         //given
-        String loginRequest = "{ \"username\": \"testUser\", \"password\": \"testPass\" }";
 
-        // when
+        //when
 
-        // then
-
+        //then
     }
 
 }

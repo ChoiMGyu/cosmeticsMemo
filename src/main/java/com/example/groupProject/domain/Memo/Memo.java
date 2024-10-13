@@ -2,17 +2,16 @@ package com.example.groupProject.domain.Memo;
 
 import com.example.groupProject.domain.User.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE) //하나의 테이블에서 모두 관리
-@DiscriminatorColumn(name = "dtype")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "dtype")
 public abstract class Memo {
 
     @Id
@@ -31,4 +30,12 @@ public abstract class Memo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_id")
     private User master;
+
+    protected Memo(LocalDate start_date, LocalDate end_date, String name, String description, User master) {
+        this.start_date = start_date;
+        this.end_date = end_date;
+        this.name = name;
+        this.description = description;
+        this.master = master;
+    }
 }
