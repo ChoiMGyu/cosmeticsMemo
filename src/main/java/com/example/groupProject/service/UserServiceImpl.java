@@ -38,5 +38,7 @@ public class UserServiceImpl {
         }
     }
 
-
+    public List<User> findByAccount(String account) {
+        return userRepository.findByAccount(account);
+    }
 }
