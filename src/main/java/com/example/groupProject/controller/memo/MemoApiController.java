@@ -1,9 +1,11 @@
 package com.example.groupProject.controller.memo;
 
+import com.example.groupProject.config.annotation.AuthUser;
 import com.example.groupProject.controller.user.UserApiController;
 import com.example.groupProject.domain.Memo.Skincare;
 import com.example.groupProject.domain.User.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
+import com.example.groupProject.dto.jwt.UserAdapter;
 import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.memo.SkincareService;
@@ -34,14 +36,14 @@ public class MemoApiController {
     private final UserServiceImpl userService;
 
     @PostMapping("/createSkincare")
-    public ResponseEntity<String> createSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody SkincareDto skincareDto) {
+    public ResponseEntity<String> createSkincareMemo(@AuthUser UserAdapter userAdapter, @Valid @RequestBody SkincareDto skincareDto) {
         logger.info("MemoApiController - Skincare에 관련된 메모를 저장");
 
-        if (customUserDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-        }
+//        if (userAdapter == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+//        }
 
-        List<User> user = userService.findByAccount(customUserDetails.getUsername());
+        List<User> user = userService.findByAccount(userAdapter.getUser().getAccount());
 
         LocalDate startDate = skincareDto.getStart_date() != null ? skincareDto.getStart_date() : LocalDate.now();
         LocalDate endDate = skincareDto.getEnd_date() != null ? skincareDto.getEnd_date() : startDate.plusMonths(6);
