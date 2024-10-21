@@ -1,9 +1,15 @@
 package com.example.groupProject.controller;
 
+import com.example.groupProject.config.SecurityConfig;
+import com.example.groupProject.domain.Memo.Skincare;
 import com.example.groupProject.domain.User.RoleType;
+import com.example.groupProject.domain.User.SkinType;
 import com.example.groupProject.domain.User.User;
+import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.service.UserServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,56 +17,143 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MockMvcBuilder;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
+
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Transactional
 @AutoConfigureMockMvc //MockMVC 객체를 빈으로 등록하지 않기 때문에 필요, 프로젝트에 있는 스프링 빈을 모두 등록
 public class LoginTest {
 
     @Autowired
-    MockMvc mvc;
-    @Autowired
-    WebApplicationContext context;
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    MockMvc mockMvc;
     @Autowired
     UserServiceImpl userService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     @BeforeEach
     public void setUp() {
-        mvc = MockMvcBuilders
-                .webAppContextSetup(this.context)
-                .apply(SecurityMockMvcConfigurers.springSecurity())
-                .build();
+
+        User user = User.createUser("account_test", "password", LocalDate.now(), SkinType.DRY, true, true, RoleType.ROLE_USER);
+
+        userService.join(user);
     }
 
     @Test
-    @WithMockUser
-    @DisplayName("Access Token 발급 로그인")
-    public void 로그인_AccessToken() throws Exception
+    @WithUserDetails(value = "account_test", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    public void 로그인사용자_서비스접근() throws Exception
     {
         //given
+        User user = userService.findByAccount("account_test").get(0);
+
+        Skincare skincare = Skincare.builder()
+                .start_date(LocalDate.now())
+                .end_date(LocalDate.now().plusMonths(6))
+                .name("토리든")
+                .description("알로에 첨가")
+                .master(user)
+                .area("얼굴")
+                .moisture("끈적")
+                .build();
 
         //when
 
         //then
+        mockMvc.perform(post("/api/memo/createSkincare")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(skincare)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void 로그인X사용자_서비스접근() throws Exception
+    {
+        //given
+        User user = userService.findByAccount("account_test").get(0);
+
+        Skincare skincare = Skincare.builder()
+                .start_date(LocalDate.now())
+                .end_date(LocalDate.now().plusMonths(6))
+                .name("토리든")
+                .description("알로에 첨가")
+                .master(user)
+                .area("얼굴")
+                .moisture("끈적")
+                .build();
+
+        //when
+
+        //then
+        mockMvc.perform(post("/api/memo/createSkincare")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(skincare)))
+                .andExpect(status().isForbidden());
+
+        //현재 @WithAnonymousUser에 대해서는 403 에러를 반환
+        //@WithMockUser에 대해서는 401 에러를 반환
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void withAnonymousUser_테스트_1() throws Exception
+    {
+        //given
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(get("/test/not"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        String content = mvcResult.getResponse().getContentAsString();
+        Assertions.assertEquals("not anonymous", content);
+
+        //https://docs.spring.io/spring-security/reference/servlet/authentication/anonymous.html
+    }
+
+    @Test
+    public void withAnonymousUser_테스트_2() throws Exception
+    {
+        //given
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(get("/test/user"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        String content = mvcResult.getResponse().getContentAsString();
+        Assertions.assertEquals("anonymousUser", content);
     }
 
 }

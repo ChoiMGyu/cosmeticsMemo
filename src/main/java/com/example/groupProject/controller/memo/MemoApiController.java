@@ -15,11 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,12 +37,12 @@ public class MemoApiController {
     private final UserServiceImpl userService;
 
     @PostMapping("/createSkincare")
-    public ResponseEntity<String> createSkincareMemo(@AuthUser UserAdapter userAdapter, @Valid @RequestBody SkincareDto skincareDto) {
+    public ResponseEntity<String> createSkincareMemo(@AuthenticationPrincipal UserAdapter userAdapter, @Valid @RequestBody SkincareDto skincareDto) {
         logger.info("MemoApiController - Skincare에 관련된 메모를 저장");
 
-//        if (userAdapter == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-//        }
+        if (userAdapter == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
 
         List<User> user = userService.findByAccount(userAdapter.getUser().getAccount());
 
@@ -59,6 +60,8 @@ public class MemoApiController {
                 .build();
 
         skincareService.saveSkincareMemo(skincare);
+
+        logger.info("MemoApiController - 메모가 정상적으로 저장되었습니다.");
 
         return ResponseEntity.status(HttpStatus.OK).body("스킨케어 메모가 저장되었습니다.");
     }

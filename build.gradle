@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -28,6 +28,7 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.18.1'
 
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+	testImplementation 'org.assertj:assertj-core:3.23.1' //assertThat을 사용하기 위함
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'

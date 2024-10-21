@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/", "/join", "/api/user/new").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/reissue").permitAll()
+                        .requestMatchers("/test/not", "/test/user").permitAll()
                         .anyRequest().authenticated());
 
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, jwtService);
