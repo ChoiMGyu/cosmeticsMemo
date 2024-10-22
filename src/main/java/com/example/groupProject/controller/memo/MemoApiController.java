@@ -37,14 +37,14 @@ public class MemoApiController {
     private final UserServiceImpl userService;
 
     @PostMapping("/createSkincare")
-    public ResponseEntity<String> createSkincareMemo(@AuthenticationPrincipal UserAdapter userAdapter, @Valid @RequestBody SkincareDto skincareDto) {
+    public ResponseEntity<String> createSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody SkincareDto skincareDto) {
         logger.info("MemoApiController - Skincare에 관련된 메모를 저장");
 
-        if (userAdapter == null) {
+        if (customUserDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
-        List<User> user = userService.findByAccount(userAdapter.getUser().getAccount());
+        List<User> user = userService.findByAccount(customUserDetails.getUsername());
 
         LocalDate startDate = skincareDto.getStart_date() != null ? skincareDto.getStart_date() : LocalDate.now();
         LocalDate endDate = skincareDto.getEnd_date() != null ? skincareDto.getEnd_date() : startDate.plusMonths(6);

@@ -117,10 +117,7 @@ public class LoginTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(skincare)))
-                .andExpect(status().isForbidden());
-
-        //현재 @WithAnonymousUser에 대해서는 403 에러를 반환
-        //@WithMockUser에 대해서는 401 에러를 반환
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
