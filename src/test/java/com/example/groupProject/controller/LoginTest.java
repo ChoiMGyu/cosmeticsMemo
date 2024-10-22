@@ -134,8 +134,6 @@ public class LoginTest {
         //then
         String content = mvcResult.getResponse().getContentAsString();
         Assertions.assertEquals("not anonymous", content);
-
-        //https://docs.spring.io/spring-security/reference/servlet/authentication/anonymous.html
     }
 
     @Test
