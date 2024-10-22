@@ -142,6 +142,7 @@ public class LoginTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void withAnonymousUser_테스트_2() throws Exception
     {
         //given
@@ -153,7 +154,7 @@ public class LoginTest {
 
         //then
         String content = mvcResult.getResponse().getContentAsString();
-        Assertions.assertEquals("anonymousUser", content);
+        Assertions.assertEquals("anonymous", content);
     }
 
 }
