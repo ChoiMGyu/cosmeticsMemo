@@ -2,8 +2,8 @@ package com.example.groupProject.config.filter;
 
 
 import com.example.groupProject.config.util.JWTUtil;
-import com.example.groupProject.domain.User.User;
-import com.example.groupProject.service.AuthService.JwtService;
+import com.example.groupProject.domain.user.User;
+import com.example.groupProject.service.authService.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;

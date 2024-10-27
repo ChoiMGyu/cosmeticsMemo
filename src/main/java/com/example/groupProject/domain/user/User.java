@@ -1,4 +1,4 @@
-package com.example.groupProject.domain.User;
+package com.example.groupProject.domain.user;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

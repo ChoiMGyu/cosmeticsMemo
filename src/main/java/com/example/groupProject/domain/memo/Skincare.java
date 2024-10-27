@@ -1,10 +1,9 @@
-package com.example.groupProject.domain.Memo;
+package com.example.groupProject.domain.memo;
 
-import com.example.groupProject.domain.User.User;
+import com.example.groupProject.domain.user.User;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 

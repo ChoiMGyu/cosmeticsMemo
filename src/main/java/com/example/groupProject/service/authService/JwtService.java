@@ -1,4 +1,4 @@
-package com.example.groupProject.service.AuthService;
+package com.example.groupProject.service.authService;
 
 import com.example.groupProject.dto.jwt.TokenDto;
 

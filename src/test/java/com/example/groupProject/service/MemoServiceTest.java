@@ -1,9 +1,7 @@
 package com.example.groupProject.service;
 
-import com.example.groupProject.domain.Memo.Skincare;
-import com.example.groupProject.domain.User.User;
-import com.example.groupProject.repository.memo.SkincareRepository;
-import com.example.groupProject.service.memo.MemoService;
+import com.example.groupProject.domain.memo.Skincare;
+import com.example.groupProject.domain.user.User;
 import com.example.groupProject.service.memo.SkincareService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;

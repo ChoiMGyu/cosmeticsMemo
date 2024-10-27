@@ -1,11 +1,8 @@
 package com.example.groupProject.controller.memo;
 
-import com.example.groupProject.config.annotation.AuthUser;
-import com.example.groupProject.controller.user.UserApiController;
-import com.example.groupProject.domain.Memo.Skincare;
-import com.example.groupProject.domain.User.User;
+import com.example.groupProject.domain.memo.Skincare;
+import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
-import com.example.groupProject.dto.jwt.UserAdapter;
 import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.memo.SkincareService;
@@ -15,11 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;

@@ -1,7 +1,5 @@
 package com.example.groupProject.service.memo;
 
-import com.example.groupProject.domain.Memo.Memo;
-import com.example.groupProject.repository.memo.MemoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

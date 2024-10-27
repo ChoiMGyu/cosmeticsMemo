@@ -1,4 +1,4 @@
-package com.example.groupProject.domain.Memo;
+package com.example.groupProject.domain.memo;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
