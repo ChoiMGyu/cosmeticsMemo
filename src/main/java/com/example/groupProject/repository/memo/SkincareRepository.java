@@ -1,6 +1,6 @@
 package com.example.groupProject.repository.memo;
 
-import com.example.groupProject.domain.Memo.Skincare;
+import com.example.groupProject.domain.memo.Skincare;
 
 public interface SkincareRepository {
 

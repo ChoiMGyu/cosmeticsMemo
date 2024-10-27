@@ -1,7 +1,7 @@
 package com.example.groupProject.controller.user;
 
-import com.example.groupProject.domain.User.RoleType;
-import com.example.groupProject.domain.User.User;
+import com.example.groupProject.domain.user.RoleType;
+import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.user.UserDto;
 import com.example.groupProject.service.UserServiceImpl;
 import jakarta.validation.Valid;

@@ -1,10 +1,7 @@
 package com.example.groupProject.controller.jwt;
 
-import com.example.groupProject.config.util.JWTUtil;
-import com.example.groupProject.controller.user.UserApiController;
 import com.example.groupProject.dto.jwt.TokenDto;
-import com.example.groupProject.repository.jwt.RefreshTokenRepository;
-import com.example.groupProject.service.AuthService.JwtService;
+import com.example.groupProject.service.authService.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

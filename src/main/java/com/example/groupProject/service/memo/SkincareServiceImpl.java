@@ -1,9 +1,8 @@
 package com.example.groupProject.service.memo;
 
-import com.example.groupProject.domain.Memo.Skincare;
+import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.repository.memo.SkincareRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

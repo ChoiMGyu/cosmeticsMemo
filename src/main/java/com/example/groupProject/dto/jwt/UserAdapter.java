@@ -1,6 +1,6 @@
 package com.example.groupProject.dto.jwt;
 
-import com.example.groupProject.domain.User.User;
+import com.example.groupProject.domain.user.User;
 import lombok.Getter;
 
 @Getter

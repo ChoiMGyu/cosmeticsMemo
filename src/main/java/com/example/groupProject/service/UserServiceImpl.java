@@ -1,6 +1,6 @@
 package com.example.groupProject.service;
 
-import com.example.groupProject.domain.User.User;
+import com.example.groupProject.domain.user.User;
 import com.example.groupProject.repository.UserRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

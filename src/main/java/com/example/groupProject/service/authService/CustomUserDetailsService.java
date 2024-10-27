@@ -1,8 +1,7 @@
-package com.example.groupProject.service.AuthService;
+package com.example.groupProject.service.authService;
 
-import com.example.groupProject.domain.User.User;
+import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
-import com.example.groupProject.dto.jwt.UserAdapter;
 import com.example.groupProject.repository.UserRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

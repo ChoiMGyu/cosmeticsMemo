@@ -1,6 +1,6 @@
 package com.example.groupProject.repository;
 
-import com.example.groupProject.domain.User.User;
+import com.example.groupProject.domain.user.User;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

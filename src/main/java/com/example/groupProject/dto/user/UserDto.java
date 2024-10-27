@@ -1,6 +1,6 @@
 package com.example.groupProject.dto.user;
 
-import com.example.groupProject.domain.User.SkinType;
+import com.example.groupProject.domain.user.SkinType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

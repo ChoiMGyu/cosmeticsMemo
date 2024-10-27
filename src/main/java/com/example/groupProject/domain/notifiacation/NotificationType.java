@@ -1,4 +1,4 @@
-package com.example.groupProject.domain.Notification;
+package com.example.groupProject.domain.notifiacation;
 
 public enum NotificationType {
     CHAT,

@@ -1,7 +1,7 @@
 package com.example.groupProject.service;
-import com.example.groupProject.domain.User.RoleType;
-import com.example.groupProject.domain.User.SkinType;
-import com.example.groupProject.domain.User.User;
+import com.example.groupProject.domain.user.RoleType;
+import com.example.groupProject.domain.user.SkinType;
+import com.example.groupProject.domain.user.User;
 import com.example.groupProject.repository.UserRepositoryImpl;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;  // JUnit 5 애너테이션

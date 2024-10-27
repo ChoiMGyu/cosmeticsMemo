@@ -1,8 +1,5 @@
 package com.example.groupProject.repository.memo;
 
-import com.example.groupProject.domain.Memo.Memo;
-import com.example.groupProject.dto.memo.SkincareDto;
-
 public interface MemoRepository {
     //메모 추가
 

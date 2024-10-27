@@ -1,8 +1,7 @@
 package com.example.groupProject.config;
 
-import com.example.groupProject.domain.jwt.RefreshToken;
 import com.example.groupProject.repository.jwt.RefreshTokenRepository;
-import com.example.groupProject.service.AuthService.JwtService;
+import com.example.groupProject.service.authService.JwtService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,8 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest

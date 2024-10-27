@@ -1,8 +1,8 @@
 package com.example.groupProject.config.filter;
 
 import com.example.groupProject.config.util.JWTUtil;
-import com.example.groupProject.domain.User.RoleType;
-import com.example.groupProject.domain.User.User;
+import com.example.groupProject.domain.user.RoleType;
+import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -17,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.management.relation.Role;
 import java.io.IOException;
 import java.io.PrintWriter;
 
