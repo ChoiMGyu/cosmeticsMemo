@@ -5,13 +5,12 @@ import com.example.groupProject.dto.memo.FcmSendDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +36,7 @@ public class FcmServiceImpl implements FcmService {
 
         HttpEntity entity = new HttpEntity<>(message, headers);
 
-        String API_URL = "<https://fcm.googleapis.com/v1/projects/groupproject-dceb5/messages:send>";
+        String API_URL = "https://fcm.googleapis.com/v1/projects/groupproject-dceb5/messages:send";
         ResponseEntity response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
         System.out.println(response.getStatusCode());
@@ -47,13 +46,13 @@ public class FcmServiceImpl implements FcmService {
 
     private String getAccessToken() throws IOException {
         //Firebase Admin SDK의 비공개 키를 참조하여 Bearer 토큰을 발급 받습니다
-        //String firebaseConfigPath = "firebase/adjh54-dev-firebase-key.json";
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("<https://www.googleapis.com/auth/cloud-platform>"));
+                .createScoped(List.of("https://www.googleapis.com/auth/firebase.messaging"));
 
         googleCredentials.refreshIfExpired();
+
         return googleCredentials.getAccessToken().getTokenValue();
     }
 

@@ -45,3 +45,7 @@ application-test.yml
 
 ### admin sdk ###
 groupproject-dceb5-firebase-adminsdk-5bwib-8d294a02a3.json
+
+/src/main/resources/static/js/firebase-messaging-sw.js
+
+/src/main/resources/templates/firebase-snippert.html

@@ -46,7 +46,7 @@ public class JwtServiceImpl implements JwtService {
         String account = jwtUtil.getAccount(refreshToken);
         String role = jwtUtil.getRole(refreshToken);
 
-        String newAccessToken = jwtUtil.createJwt("access", account, role, 600000L);
+        String newAccessToken = jwtUtil.createJwt("access", account, role, 600000000L);
         String newRefreshToken = jwtUtil.createJwt("refresh", account, role, 86400000L);
 
         refreshTokenRepository.deleteByRefreshToken(refreshToken);
