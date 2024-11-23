@@ -24,4 +24,12 @@ public class SkincareServiceImpl implements SkincareService {
     public Skincare findById(Long id) {
         return skincareRepository.findById(id);
     }
+
+    @Override
+    @Transactional
+    public void deleteSkincareMemo(Skincare skincare) {
+        skincareRepository.delete(skincare);
+    }
+
+
 }
