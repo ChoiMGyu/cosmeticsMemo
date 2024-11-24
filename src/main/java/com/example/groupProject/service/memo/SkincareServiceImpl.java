@@ -16,6 +16,7 @@ public class SkincareServiceImpl implements SkincareService {
     @Override
     @Transactional
     public Long saveSkincareMemo(Skincare skincare) {
+        //end_date가 설정되었을 때 start_date보다 빠른 날짜면 오류 발생 -> 도메인
         skincareRepository.save(skincare);
         return skincare.getId();
     }
