@@ -27,7 +27,6 @@ public class UserApiController {
 
     @PostMapping("/new")
     public ResponseEntity<String> register(@Valid @RequestBody UserDto userDto) {
-        //입력받은 패스워드와 패스워드 확인란이 동일한지 검사
         logger.info("UserApiController - 회원 가입 요청");
         if (!userDto.getPassword().equals(userDto.getPassword_chk())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(NOT_SAME_PASSWORD_MESSAGE);

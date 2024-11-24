@@ -19,25 +19,19 @@ public class FcmJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         if (fcmService == null) {
-            // [STEP1] Service 인터페이스를 호출하기 위해 ApplicationContext에 appContext 이름으로 bean을 등록합니다.
             ApplicationContext appCtx = (ApplicationContext) jobExecutionContext.getJobDetail().getJobDataMap().get("appContext");
             fcmService = appCtx.getBean(FcmService.class);
         }
 
-        // [STEP2] FCM 전송 리스트 구성합니다. : FCM 토큰을 구성합니다.
         List<FcmSendDeviceDto> selectFcmSendList = fcmService.selectFcmSendList();
 
-        // [STEP3] 리스트를 순회하며 값들을 추출합니다. : 토큰 값을 반환하여 FCM에 전송할 데이터를 구성합니다.
         for (FcmSendDeviceDto fcmSendItem : selectFcmSendList) {
-
-            // [STEP4] FCM 전송 데이터를 구성합니다.
             FcmSendDto fcmSendDto = FcmSendDto.builder()
                     .token(fcmSendItem.deviceToken())
                     .title(fcmSendItem.cosmeticName() + "의 사용 기한이 지났어요!")
                     .body(fcmSendItem.writer() + "님의 화장품이 사용 기한 마지막 날짜(" + fcmSendItem.endDate().toString() + ")")
                     .build();
             try {
-                // [STEP5] FCM 전송을 합니다.
                 fcmService.sendMessageTo(fcmSendDto);
             } catch (IOException e) {
                 throw new RuntimeException(e);

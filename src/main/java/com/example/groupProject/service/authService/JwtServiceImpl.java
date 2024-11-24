@@ -59,7 +59,6 @@ public class JwtServiceImpl implements JwtService {
         refreshTokenRepository.deleteByRefreshToken(refreshToken);
         addRefresh(account, newRefreshToken);
 
-        // 새로운 Access Token과 Refresh Token을 반환
         return new TokenDto(newAccessToken, newRefreshToken);
     }
 }

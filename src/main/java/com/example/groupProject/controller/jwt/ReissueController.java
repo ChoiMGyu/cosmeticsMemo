@@ -36,10 +36,8 @@ public class ReissueController {
                 }
             }
 
-            // TokenService에서 비즈니스 로직 수행 후 새로운 토큰 반환
             TokenDto newToken = jwtService.reissueToken(refreshToken);
 
-            // 새 토큰을 Response에 설정
             response.setHeader("access", newToken.getAccessToken());
             response.addCookie(createCookie("refresh", newToken.getRefreshToken()));
 
