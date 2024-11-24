@@ -7,7 +7,7 @@ import lombok.Getter;
 @Entity
 @DiscriminatorValue("C")
 @Getter
-public class Color extends Memo{
+public class Color extends Memo {
 
     private int shade_number; //컬러 옵션 ex) 21호, 23호 등
 

@@ -17,10 +17,9 @@ public class FcmRepositoryImpl implements FcmRepository {
 
     @Override
     public void save(DeviceToken deviceToken) {
-        if(deviceToken.getId() == null) {
+        if (deviceToken.getId() == null) {
             em.persist(deviceToken);
-        }
-        else {
+        } else {
             em.merge(deviceToken);
         }
     }
@@ -36,10 +35,10 @@ public class FcmRepositoryImpl implements FcmRepository {
     @Override
     public List<String> findDeviceTokensByMemo(Long userId) {
         return em.createQuery(
-                "select dt.deviceNumber " +
-                "from DeviceToken dt " +
-                "join dt.user u " +
-                "where u.id = :userId", String.class)
+                        "select dt.deviceNumber " +
+                                "from DeviceToken dt " +
+                                "join dt.user u " +
+                                "where u.id = :userId", String.class)
                 .setParameter("userId", userId)
                 .getResultList();
     }

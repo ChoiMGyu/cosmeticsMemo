@@ -2,7 +2,9 @@ package com.example.groupProject.domain.memo;
 
 import com.example.groupProject.domain.user.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
