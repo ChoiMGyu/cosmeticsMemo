@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class ReissueController {
+    private static final String REISSUE_COMPLETE_MESSAGE = "정상적으로 Refresh Token이 갱신되었습니다.";
+
     private static final Logger logger = LoggerFactory.getLogger(ReissueController.class);
+
     private final JwtService jwtService;
 
     @PostMapping("/reissue")
@@ -40,7 +43,7 @@ public class ReissueController {
             response.setHeader("access", newToken.getAccessToken());
             response.addCookie(createCookie("refresh", newToken.getRefreshToken()));
 
-            return ResponseEntity.status(HttpStatus.OK).body("정상적으로 Refresh Token이 갱신되었습니다.");
+            return ResponseEntity.status(HttpStatus.OK).body(REISSUE_COMPLETE_MESSAGE);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -48,7 +51,7 @@ public class ReissueController {
 
     private Cookie createCookie(String key, String value) {
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24*60 *60); //쿠키의 생명주기
+        cookie.setMaxAge(24 * 60 * 60); //쿠키의 생명주기
         //cookie.setSecure(true); //https 통신을 사용할 경우
         //cookie.setPath("/"); //쿠키가 적용될 범위
         cookie.setHttpOnly(true);

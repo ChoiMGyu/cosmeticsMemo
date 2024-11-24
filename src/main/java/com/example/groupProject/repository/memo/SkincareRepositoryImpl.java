@@ -7,16 +7,15 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class SkincareRepositoryImpl implements SkincareRepository{
+public class SkincareRepositoryImpl implements SkincareRepository {
 
     private final EntityManager em;
 
     @Override
     public void save(Skincare skincare) {
-        if(skincare.getId() == null) {
+        if (skincare.getId() == null) {
             em.persist(skincare);
-        }
-        else {
+        } else {
             em.merge(skincare);
         }
     }

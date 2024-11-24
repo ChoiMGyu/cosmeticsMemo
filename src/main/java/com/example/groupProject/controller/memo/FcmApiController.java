@@ -1,5 +1,6 @@
 package com.example.groupProject.controller.memo;
 
+import com.example.groupProject.controller.message.ErrorMessage;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
 import com.example.groupProject.dto.memo.DeviceTokenRegisterDto;
@@ -39,7 +40,7 @@ public class FcmApiController {
         logger.info("FcmApiController - User의 DeviceToken을 등록");
 
         if (customUserDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage());
         }
 
         List<User> user = userService.findByAccount(customUserDetails.getUsername());

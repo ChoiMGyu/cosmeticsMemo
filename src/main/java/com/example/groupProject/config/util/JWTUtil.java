@@ -37,7 +37,7 @@ public class JWTUtil {
 
     //발급
     public String createJwt(String category, String account, String role, Long expiredMs) {
-        String token =  Jwts.builder()
+        String token = Jwts.builder()
                 .claim("category", category)
                 .claim("account", account)
                 .claim("role", role)

@@ -13,6 +13,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl {
+    private static final String EXIST_USER_MESSAGE = "이미 존재하는 아아디입니다.";
 
     private final UserRepositoryImpl userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -33,8 +34,8 @@ public class UserServiceImpl {
 
     private void validateDuplicateAccount(User user) {
         List<User> findMembers = userRepository.findByAccount(user.getAccount());
-        if(!findMembers.isEmpty()) {
-            throw new IllegalStateException("이미 존재하는 아아디입니다.");
+        if (!findMembers.isEmpty()) {
+            throw new IllegalStateException(EXIST_USER_MESSAGE);
         }
     }
 

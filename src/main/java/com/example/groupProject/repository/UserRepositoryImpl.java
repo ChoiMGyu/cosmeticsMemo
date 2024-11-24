@@ -13,7 +13,6 @@ public class UserRepositoryImpl {
 
     private final EntityManager em;
 
-
     public void save(User user) {
         em.persist(user);
     }

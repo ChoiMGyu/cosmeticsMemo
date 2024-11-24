@@ -70,7 +70,9 @@ public class User {
         this.sex = sex;
     }
 
-    private void initialRole(RoleType role) {this.role = role;}
+    private void initialRole(RoleType role) {
+        this.role = role;
+    }
 
     // 패스워드 업데이트 메서드
     public void updatePassword(String encryptedPassword) {

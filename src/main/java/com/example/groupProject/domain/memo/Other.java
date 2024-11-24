@@ -7,7 +7,7 @@ import lombok.Getter;
 @Entity
 @DiscriminatorValue("O")
 @Getter
-public class Other extends Memo{
+public class Other extends Memo {
 
     private String productType; //제품의 유형 ex) 향수, 바디로션 등
 
