@@ -83,7 +83,7 @@ public class FcmServiceImpl implements FcmService {
             Long userId = memo.getMaster().getId();
             List<String> deviceTokens = fcmRepository.findDeviceTokensByMemo(userId);
             for (String token : deviceTokens) {
-                fcmSendDeviceDtos.add(new FcmSendDeviceDto(token));
+                fcmSendDeviceDtos.add(new FcmSendDeviceDto(token, memo.getName(), memo.getMaster().getAccount(), memo.getEnd_date()));
             }
         }
 
