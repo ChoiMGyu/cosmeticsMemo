@@ -27,7 +27,7 @@ public class FcmController {
     @PostMapping("/send")
     public ResponseEntity<Object> pushMessage(@RequestBody @Validated FcmSendDto fcmSendDto) throws IOException {
         log.debug("[+] 푸시 메시지를 전송합니다. ");
-        int result = fcmService.sendMessageTo(fcmSendDto);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        fcmService.sendMessageTo(fcmSendDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -94,4 +94,36 @@ public class MemoServiceTest {
         Assertions.assertNull(deletedSkincare);
     }
 
+    @Test
+    @DisplayName("기한이 지난 날짜의 메모를 반환한다")
+    public void 기한이_지난메모_반환() throws Exception {
+        //given
+        Skincare skincareTest = Skincare.builder()
+                .start_date(LocalDate.now().minusDays(2))
+                .end_date(LocalDate.now().minusDays(1))
+                .name("테스트 화장품 1")
+                .description("기한이 지난 화장품입니다.")
+                .master(user)
+                .area("얼굴")
+                .build();
+
+        skincareService.saveSkincareMemo(skincareTest);
+
+        //when
+        //memoService.checkExpiredMemos();
+
+        //then
+    }
+
+    @Test
+    @DisplayName("사용기한 마지막 날짜가 시작 날짜 이전으로 설정할 수 없다")
+    public void 사용기한_설정() throws Exception {
+        //given
+
+        //when
+
+        //then
+    }
+
+
 }
