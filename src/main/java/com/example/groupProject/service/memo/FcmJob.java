@@ -33,8 +33,8 @@ public class FcmJob implements Job {
             // [STEP4] FCM 전송 데이터를 구성합니다.
             FcmSendDto fcmSendDto = FcmSendDto.builder()
                     .token(fcmSendItem.deviceToken())
-                    .title("푸시 메시지입니다!")
-                    .body("계획된 시간이 되었어요!")
+                    .title(fcmSendItem.cosmeticName() + "의 사용 기한이 지났어요!")
+                    .body(fcmSendItem.writer() + "님의 화장품이 사용 기한 마지막 날짜(" + fcmSendItem.endDate().toString() + ")")
                     .build();
             try {
                 // [STEP5] FCM 전송을 합니다.
