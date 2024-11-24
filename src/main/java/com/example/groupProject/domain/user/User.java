@@ -74,7 +74,6 @@ public class User {
         this.role = role;
     }
 
-    // 패스워드 업데이트 메서드
     public void updatePassword(String encryptedPassword) {
         this.password = encryptedPassword;
     }

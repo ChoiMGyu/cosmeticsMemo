@@ -46,7 +46,6 @@ public class FcmServiceImpl implements FcmService {
 
     @Override
     public void sendMessageTo(FcmSendDto fcmSendDto) throws IOException {
-        //메시지를 구성하고 토큰을 받아서 FCM으로 메시지 처리를 수행하는 비즈니스 로직
         String message = makeMessage(fcmSendDto);
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters()
@@ -72,10 +71,6 @@ public class FcmServiceImpl implements FcmService {
 
     @Override
     public List<FcmSendDeviceDto> selectFcmSendList() {
-        //1. 알림을 전송 해야할 메모를 찾는다
-        //2. 메모들의 작성자를 찾는다
-        //3. 작성자의 디바이스 토큰을 반환한다
-
         List<Memo> expiredMemo = fcmRepository.findByEndDateAfter();
 
         List<FcmSendDeviceDto> fcmSendDeviceDtos = new ArrayList<>();
@@ -91,8 +86,6 @@ public class FcmServiceImpl implements FcmService {
     }
 
     private String getAccessToken() throws IOException {
-        //Firebase Admin SDK의 비공개 키를 참조하여 Bearer 토큰을 발급 받습니다
-
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
                 .createScoped(List.of("https://www.googleapis.com/auth/firebase.messaging"));
@@ -102,7 +95,6 @@ public class FcmServiceImpl implements FcmService {
     }
 
     private String makeMessage(FcmSendDto fcmSendDto) throws JsonProcessingException {
-        //FCM 전송 정보를 기반으로 메시지를 구성합니다 (Object -> String)
         ObjectMapper om = new ObjectMapper();
         FcmMessageDto fcmMessageDto = FcmMessageDto.builder()
                 .message(FcmMessageDto.Message.builder()

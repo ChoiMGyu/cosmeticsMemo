@@ -25,22 +25,20 @@ public class SchedulerConfiguration implements WebMvcConfigurer {
     @PostConstruct
     private void configScheduler() throws SchedulerException {
 
-        JobDataMap ctx = new JobDataMap();                  // 스케줄러에게 애플리케이션 영역을 추가합니다.
-        ctx.put(APPLICATION_NAME, applicationContext);      // 애플리케이션 영역을 "appContext"으로 지정합니다.
+        JobDataMap ctx = new JobDataMap();
+        ctx.put(APPLICATION_NAME, applicationContext);
 
-        // [STEP1] Job 생성
         JobDetail job = JobBuilder
-                .newJob(FcmJob.class)                                   // Job 구현 클래스
-                .withIdentity("fcmSendJob", "fcmGroup")     // Job 이름, 그룹 지정
-                .withDescription("FCM 처리를 위한 조회 Job")   // Job 설명
+                .newJob(FcmJob.class)
+                .withIdentity("fcmSendJob", "fcmGroup")
+                .withDescription("FCM 처리를 위한 조회 Job")
                 .setJobData(ctx)
                 .build();
 
-        // [STEP2] Trigger 생성
         Trigger trigger = TriggerBuilder
                 .newTrigger()
-                .withIdentity("fcmSendTrigger", "fcmGroup")         // Trigger 이름, 그룹 지정
-                .withDescription("FCM 처리를 위한 조회 Trigger")     // Trigger 설명
+                .withIdentity("fcmSendTrigger", "fcmGroup")
+                .withDescription("FCM 처리를 위한 조회 Trigger")
                 .startNow()
                 .withSchedule(
                         SimpleScheduleBuilder
@@ -49,7 +47,6 @@ public class SchedulerConfiguration implements WebMvcConfigurer {
                                 .repeatForever())
                 .build();
 
-        // [STEP3] 스케줄러 생성 및 Job, Trigger 등록
         scheduler = new StdSchedulerFactory().getScheduler();
         FcmJobListener fcmJobListener = new FcmJobListener();
         scheduler.getListenerManager().addJobListener(fcmJobListener);

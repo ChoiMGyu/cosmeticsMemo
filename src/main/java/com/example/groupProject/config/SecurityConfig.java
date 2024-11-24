@@ -39,25 +39,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        //csrf disable
         http
                 .csrf((auth) -> auth.disable());
 
-        //form 로그인 방식 disable
         http
                 .formLogin((auth) -> auth.disable());
 
-        //http basic 인증 방식 disable
         http
                 .httpBasic((auth) -> auth.disable());
 
-        //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/login", "/", "/join", "/api/user/new", "/alarm", "/send").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/reissue").permitAll()
-                        .requestMatchers("/test/not", "/test/user", "/api/memo/createSkincare").permitAll()
+                        .requestMatchers("/api/memo/createSkincare").permitAll()
                         .anyRequest().authenticated());
 
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, jwtService);
@@ -69,7 +64,6 @@ public class SecurityConfig {
         http
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
-        //세션 설정
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
