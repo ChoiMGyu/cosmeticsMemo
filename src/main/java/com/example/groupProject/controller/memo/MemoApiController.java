@@ -1,6 +1,7 @@
 package com.example.groupProject.controller.memo;
 
 import com.example.groupProject.controller.message.ErrorMessage;
+import com.example.groupProject.controller.validator.MemoApiValidator;
 import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,12 +28,13 @@ import java.util.List;
 public class MemoApiController {
     private static final int MEMO_WRITER = 0;
     private static final String SUCCESS_CREATE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 저장되었습니다.";
+    private static final String DATE_VALID_MESSAGE = "사용 기한 마지막 날짜가 개봉 날짜 이전으로 설정할 수 없습니다.";
 
     private static final Logger logger = LoggerFactory.getLogger(MemoApiController.class);
 
     private final SkincareService skincareService;
-
     private final UserServiceImpl userService;
+    private final MemoApiValidator memoApiValidator;
 
     @PostMapping("/createSkincare")
     public ResponseEntity<String> createSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody SkincareDto skincareDto) {
@@ -45,12 +46,11 @@ public class MemoApiController {
 
         List<User> user = userService.findByAccount(customUserDetails.getUsername());
 
-        LocalDate startDate = skincareDto.getStart_date() != null ? skincareDto.getStart_date() : LocalDate.now();
-        LocalDate endDate = skincareDto.getEnd_date() != null ? skincareDto.getEnd_date() : startDate.plusMonths(6);
+        memoApiValidator.validateDate(skincareDto);
 
         Skincare skincare = Skincare.builder()
-                .start_date(startDate)
-                .end_date(endDate)
+                .start_date(skincareDto.getStart_date())
+                .end_date(skincareDto.getEnd_date())
                 .name(skincareDto.getName())
                 .description(skincareDto.getDescription())
                 .master(user.get(MEMO_WRITER))
