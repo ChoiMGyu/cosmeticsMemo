@@ -1,5 +1,6 @@
 package com.example.groupProject.dto.memo;
 
+import com.example.groupProject.domain.memo.Skincare;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,10 @@ public class SkincareDto {
 
     private String area; // 사용 부위 (선택 사항)
     private String moisture; // 보습 정도 (선택 사항)
+
+    public static SkincareDto from(Skincare skincare) {
+        return new SkincareDto(skincare.getStart_date(), skincare.getEnd_date(),
+                skincare.getName(), skincare.getDescription(),
+                skincare.getArea(), skincare.getMoisture());
+    }
 }

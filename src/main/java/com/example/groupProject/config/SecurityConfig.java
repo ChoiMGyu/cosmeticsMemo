@@ -49,11 +49,10 @@ public class SecurityConfig {
                 .httpBasic((auth) -> auth.disable());
 
         http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/", "/join", "/api/user/new", "/alarm", "/send").permitAll()
-                        .requestMatchers("/reissue").permitAll()
-                        .requestMatchers("/api/memo/createSkincare").permitAll()
-                        .anyRequest().authenticated());
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(publicUrls()).permitAll()
+                        .anyRequest().authenticated()
+                );
 
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, jwtService);
         loginFilter.setUsernameParameter("account");
@@ -69,6 +68,14 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    private static String[] publicUrls() {
+        return new String[] {
+                "/login", "/", "/join", "/api/user/new",
+                "/alarm", "/send", "/reissue",
+                "/test/not", "/test/user"
+        };
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package com.example.groupProject.repository;
+package com.example.groupProject.repository.user;
 
 import com.example.groupProject.domain.user.User;
 import jakarta.persistence.EntityManager;

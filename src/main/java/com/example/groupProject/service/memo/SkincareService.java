@@ -1,12 +1,15 @@
 package com.example.groupProject.service.memo;
 
 import com.example.groupProject.domain.memo.Skincare;
+import com.example.groupProject.domain.user.User;
+import com.example.groupProject.dto.memo.SkincareDto;
 
 public interface SkincareService {
 
-    public Long saveSkincareMemo(Skincare skincare);
+    Long saveSkincareMemo(SkincareDto skincareDto, User user);
 
-    public Skincare findById(Long id);
+    Skincare findById(Long id);
 
-    public void deleteSkincareMemo(Skincare skincare);
+    void deleteByIdSkincareMemo(Long id);
+
 }

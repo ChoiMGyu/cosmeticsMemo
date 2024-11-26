@@ -2,6 +2,7 @@ package com.example.groupProject.service;
 
 import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
+import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.service.memo.SkincareService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
@@ -18,6 +19,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -50,8 +53,13 @@ public class MemoServiceTest {
                 .area("얼굴")
                 .build();
 
-        skincareService.saveSkincareMemo(skincare);
+        SkincareDto skincareDto = SkincareDto.from(skincare);
+
+        Long memoId = skincareService.saveSkincareMemo(skincareDto, user);
         em.flush();
+        em.clear();
+
+        skincare = skincareService.findById(memoId);
     }
 
     @Test
@@ -66,10 +74,10 @@ public class MemoServiceTest {
                 .area("얼굴")
                 .build();
 
-        //end_date와 moisture을 제외한 나머지 필드 설정
+        SkincareDto skincareDto = SkincareDto.from(skincareTest);
 
         //when
-        Long memoId = skincareService.saveSkincareMemo(skincareTest);
+        Long memoId = skincareService.saveSkincareMemo(skincareDto, user);
 
         //then
         Skincare findMemo = skincareService.findById(memoId);
@@ -86,12 +94,12 @@ public class MemoServiceTest {
         //given
 
         //when
-        skincareService.deleteSkincareMemo(skincare);
-        em.flush(); //delete 쿼리 확인용
+        skincareService.deleteByIdSkincareMemo(skincare.getId());
+        em.flush();
 
         //then
         Skincare deletedSkincare = skincareService.findById(skincare.getId());
-        Assertions.assertNull(deletedSkincare);
+        assertNull(deletedSkincare);
     }
 
     @Test
@@ -107,7 +115,9 @@ public class MemoServiceTest {
                 .area("얼굴")
                 .build();
 
-        skincareService.saveSkincareMemo(skincareTest);
+        SkincareDto skincareDto = SkincareDto.from(skincareTest);
+
+        skincareService.saveSkincareMemo(skincareDto, user);
 
         //when
         //memoService.checkExpiredMemos();

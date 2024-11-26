@@ -1,6 +1,8 @@
 package com.example.groupProject.service.memo;
 
 import com.example.groupProject.domain.memo.Skincare;
+import com.example.groupProject.domain.user.User;
+import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.repository.memo.SkincareRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +17,17 @@ public class SkincareServiceImpl implements SkincareService {
 
     @Override
     @Transactional
-    public Long saveSkincareMemo(Skincare skincare) {
-        //end_date가 설정되었을 때 start_date보다 빠른 날짜면 오류 발생 -> 도메인
+    public Long saveSkincareMemo(SkincareDto skincareDto, User user) {
+        Skincare skincare = Skincare.builder()
+                .start_date(skincareDto.getStart_date())
+                .end_date(skincareDto.getEnd_date())
+                .name(skincareDto.getName())
+                .description(skincareDto.getDescription())
+                .master(user)
+                .area(skincareDto.getArea())
+                .moisture(skincareDto.getMoisture())
+                .build();
+
         skincareRepository.save(skincare);
         return skincare.getId();
     }
@@ -28,8 +39,8 @@ public class SkincareServiceImpl implements SkincareService {
 
     @Override
     @Transactional
-    public void deleteSkincareMemo(Skincare skincare) {
-        skincareRepository.delete(skincare);
+    public void deleteByIdSkincareMemo(Long id) {
+        skincareRepository.deleteById(id);
     }
 
 
