@@ -5,6 +5,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class SkincareRepositoryImpl implements SkincareRepository {
@@ -28,5 +30,11 @@ public class SkincareRepositoryImpl implements SkincareRepository {
     @Override
     public void delete(Skincare skincare) {
         em.remove(skincare);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        Skincare findSkincare = em.find(Skincare.class, id);
+        delete(findSkincare);
     }
 }

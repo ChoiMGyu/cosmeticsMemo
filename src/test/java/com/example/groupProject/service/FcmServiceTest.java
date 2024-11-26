@@ -3,6 +3,7 @@ package com.example.groupProject.service;
 import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.memo.FcmSendDeviceDto;
+import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.service.memo.FcmService;
 import com.example.groupProject.service.memo.SkincareService;
 import jakarta.persistence.EntityManager;
@@ -84,9 +85,13 @@ public class FcmServiceTest {
                 .area("얼굴")
                 .build();
 
-        skincareService.saveSkincareMemo(skincare);
-        skincareService.saveSkincareMemo(totalcare);
-        skincareService.saveSkincareMemo(samplecare);
+        SkincareDto skincareDto = SkincareDto.from(skincare);
+        SkincareDto totalcareDto = SkincareDto.from(totalcare);
+        SkincareDto samplecareDto = SkincareDto.from(samplecare);
+
+        skincareService.saveSkincareMemo(skincareDto, user1);
+        skincareService.saveSkincareMemo(totalcareDto, user2);
+        skincareService.saveSkincareMemo(samplecareDto, user3);
 
         fcmService.saveDeviceToken(deviceToken, user1);
         fcmService.saveDeviceToken(deviceToken, user2);
