@@ -8,6 +8,7 @@ import com.example.groupProject.service.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -24,9 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,12 +36,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Transactional
 @AutoConfigureMockMvc //MockMVC 객체를 빈으로 등록하지 않기 때문에 필요, 프로젝트에 있는 스프링 빈을 모두 등록
+@ActiveProfiles("test")
 public class LoginTest {
 
     @Autowired
     MockMvc mockMvc;
+
     @Autowired
     UserServiceImpl userService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -55,8 +59,7 @@ public class LoginTest {
 
     @Test
     @WithUserDetails(value = "account_test", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    public void 로그인사용자_서비스접근() throws Exception
-    {
+    public void 로그인사용자_서비스접근() throws Exception {
         //given
         User user = userService.findByAccount("account_test").get(0);
 
@@ -73,16 +76,16 @@ public class LoginTest {
         //when
 
         //then
-        mockMvc.perform(post("/api/memo/createSkincare")
+        mockMvc.perform(post("/api/memo/skincare")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(skincare)))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @WithAnonymousUser
-    public void 로그인X사용자_서비스접근() throws Exception
-    {
+    @WithMockUser
+    @DisplayName("로그인을 하지 않아 AccessToken이 존재하지 않으면 authenticated()에 접근하지 못한다")
+    public void 로그인X사용자_서비스접근() throws Exception {
         //given
         User user = userService.findByAccount("account_test").get(0);
 
@@ -99,7 +102,7 @@ public class LoginTest {
         //when
 
         //then
-        mockMvc.perform(post("/api/memo/createSkincare")
+        mockMvc.perform(post("/api/memo/skincare")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(skincare)))
@@ -108,8 +111,7 @@ public class LoginTest {
 
     @Test
     @WithAnonymousUser
-    public void withAnonymousUser_테스트_1() throws Exception
-    {
+    public void withAnonymousUser_테스트_1() throws Exception {
         //given
 
         //when
@@ -124,8 +126,7 @@ public class LoginTest {
 
     @Test
     @WithAnonymousUser
-    public void withAnonymousUser_테스트_2() throws Exception
-    {
+    public void withAnonymousUser_테스트_2() throws Exception {
         //given
 
         //when

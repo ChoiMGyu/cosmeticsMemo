@@ -5,11 +5,13 @@ import com.example.groupProject.service.memo.FcmJobListener;
 import jakarta.annotation.PostConstruct;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@ConditionalOnProperty(name = "scheduler.enabled", havingValue = "true", matchIfMissing = false)
 public class SchedulerConfiguration implements WebMvcConfigurer {
 
     private static String APPLICATION_NAME = "appContext";
