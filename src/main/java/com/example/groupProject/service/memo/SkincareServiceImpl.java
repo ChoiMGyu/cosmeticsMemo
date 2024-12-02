@@ -48,4 +48,11 @@ public class SkincareServiceImpl implements SkincareService {
         skincareRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional
+    public void updateSkincareMemo(Long id, SkincareDto skincareDto) {
+        Skincare findSkincare = skincareRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_MEMO));
+        findSkincare.changeSkincare(skincareDto);
+    }
 }

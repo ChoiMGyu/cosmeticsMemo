@@ -12,4 +12,5 @@ public interface SkincareService {
 
     void deleteByIdSkincareMemo(Long id);
 
+    void updateSkincareMemo(Long id, SkincareDto skincareDto);
 }

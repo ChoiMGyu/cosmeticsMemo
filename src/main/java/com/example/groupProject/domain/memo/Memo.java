@@ -39,4 +39,12 @@ public abstract class Memo {
         this.description = description;
         this.master = master;
     }
+
+
+    protected void changeMemo(LocalDate end_date, LocalDate start_date, String name, String description) {
+        this.end_date = end_date;
+        this.start_date = start_date;
+        this.name = name;
+        this.description = description;
+    }
 }
