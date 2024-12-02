@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -54,5 +56,10 @@ public class SkincareServiceImpl implements SkincareService {
         Skincare findSkincare = skincareRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_MEMO));
         findSkincare.changeSkincare(skincareDto);
+    }
+
+    public List<Skincare> findAllSkincareMemo() {
+        List<Skincare> allSkincare = skincareRepository.findAll();
+        return allSkincare;
     }
 }
