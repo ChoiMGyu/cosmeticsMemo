@@ -97,6 +97,4 @@ public class SkincareRepositoryTest {
         assertTrue(findSkincare.isPresent());
         assertThat(findSkincare.get()).isEqualTo(skincare);
     }
-
-
 }
