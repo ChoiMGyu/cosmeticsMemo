@@ -81,8 +81,7 @@ public class SkincareServiceTest {
 
     @Test
     @DisplayName("스킨케어 메모를 모두 찾아온다")
-    public void 스킨케어_모두찾기() throws Exception
-    {
+    public void 스킨케어_모두찾기() throws Exception {
         //given
         Skincare skincare1 = Skincare.builder()
                 .start_date(LocalDate.now())
