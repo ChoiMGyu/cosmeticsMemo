@@ -52,8 +52,9 @@ public class MemoApiController {
         return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_CREATE_SKINCARE_MEMO_MESSAGE);
     }
 
-    @DeleteMapping("/skincare/{id}")
-    public ResponseEntity<String> deleteSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable("id") Long id) {
+    @DeleteMapping("/skincare")
+    public ResponseEntity<String> deleteSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                     @RequestParam(value = "id") Long id) {
         logger.info("MemoApiController - Skincare에 관련된 메모를 삭제");
 
         if (customUserDetails == null) {
@@ -64,4 +65,22 @@ public class MemoApiController {
 
         return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_DELETE_SKINCARE_MEMO_MESSAGE);
     }
+
+    @PutMapping("/skincare")
+    public ResponseEntity<String> updateSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                     @RequestParam(value = "id") Long id,
+                                                     @RequestBody @Valid SkincareDto skincareDto) {
+        logger.info("MemoApiController - Skincare에 관련된 메모를 수정");
+
+        if (customUserDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage());
+        }
+
+        memoApiValidator.validateDate(skincareDto);
+
+        skincareService.updateSkincareMemo(id, skincareDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_UPDATE_SKINCARE_MEMO_MESSAGE);
+    }
+
 }

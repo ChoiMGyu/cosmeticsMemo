@@ -34,4 +34,9 @@ public class Skincare extends Memo {
         this.moisture = moisture;
     }
 
+    public void changeSkincare(SkincareDto skincareDto) {
+        changeMemo(skincareDto.getEnd_date(), skincareDto.getStart_date(), skincareDto.getName(), skincareDto.getDescription());
+        this.area = skincareDto.getArea();
+        this.moisture = skincareDto.getMoisture();
+    }
 }
