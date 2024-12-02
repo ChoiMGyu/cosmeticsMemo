@@ -109,7 +109,7 @@ public class SkincareServiceTest {
         assertTrue(allSkincare.contains(skincare1));
         assertTrue(allSkincare.contains(skincare2));
 
-        verify(skincareRepository, times(1)).findAll();
+        verify(skincareRepository, times(1)).findAllByIdFetchJoin(1L);
     }
 
 }

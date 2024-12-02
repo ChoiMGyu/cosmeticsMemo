@@ -58,8 +58,8 @@ public class SkincareServiceImpl implements SkincareService {
         findSkincare.changeSkincare(skincareDto);
     }
 
-    public List<Skincare> findAllSkincareMemo() {
-        List<Skincare> allSkincare = skincareRepository.findAll();
+    public List<Skincare> findAllSkincareMemo(Long id) {
+        List<Skincare> allSkincare = skincareRepository.findAllByIdFetchJoin(id);
         return allSkincare;
     }
 }
