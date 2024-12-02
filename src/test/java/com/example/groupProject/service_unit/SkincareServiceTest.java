@@ -16,7 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -75,6 +77,40 @@ public class SkincareServiceTest {
 
         //then
         verify(skincareRepository, times(1)).deleteById(skincareId);
+    }
+
+    @Test
+    @DisplayName("스킨케어 메모를 모두 찾아온다")
+    public void 스킨케어_모두찾기() throws Exception
+    {
+        //given
+        Skincare skincare1 = Skincare.builder()
+                .start_date(LocalDate.now())
+                .name("기초케어 화장품 1")
+                .description("세안 후 첫 단계에 사용하는 화장품입니다.")
+                .area("얼굴")
+                .build();
+
+        Skincare skincare2 = Skincare.builder()
+                .start_date(LocalDate.now())
+                .name("기초케어 화장품 2")
+                .description("세안 후 두 번째 단계에 사용하는 화장품입니다.")
+                .area("얼굴")
+                .build();
+
+        List<Skincare> skincareList = List.of(skincare1, skincare2);
+        when(skincareRepository.findAll()).thenReturn(skincareList);
+
+        //when
+        List<Skincare> allSkincare = skincareService.findAllSkincareMemo();
+
+        //then
+        assertNotNull(allSkincare);
+        assertEquals(2, allSkincare.size());
+        assertTrue(allSkincare.contains(skincare1));
+        assertTrue(allSkincare.contains(skincare2));
+
+        verify(skincareRepository, times(1)).findAll();
     }
 
 }
