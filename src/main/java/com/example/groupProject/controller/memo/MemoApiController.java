@@ -2,7 +2,6 @@ package com.example.groupProject.controller.memo;
 
 import com.example.groupProject.controller.message.ErrorMessage;
 import com.example.groupProject.controller.validator.MemoApiValidator;
-import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
 import com.example.groupProject.dto.memo.SkincareDto;
@@ -26,6 +25,7 @@ public class MemoApiController {
     private static final int MEMO_WRITER = 0;
     private static final String SUCCESS_CREATE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 저장되었습니다.";
     private static final String SUCCESS_DELETE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 삭제되었습니다.";
+    private static final String SUCCESS_UPDATE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 수정되었습니다.";
 
     private static final Logger logger = LoggerFactory.getLogger(MemoApiController.class);
 

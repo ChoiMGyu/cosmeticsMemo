@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SkincareServiceImpl implements SkincareService {
+    private final String NOT_EXIST_MEMO = "선택하신 메모의 ID가 존재하지 않습니다.";
 
     private final SkincareRepository skincareRepository;
 
@@ -34,14 +35,17 @@ public class SkincareServiceImpl implements SkincareService {
 
     @Override
     public Skincare findById(Long id) {
-        return skincareRepository.findById(id);
+        return skincareRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_MEMO));
     }
 
     @Override
     @Transactional
     public void deleteByIdSkincareMemo(Long id) {
+        if (!skincareRepository.existsById(id)) {
+            throw new IllegalArgumentException(NOT_EXIST_MEMO);
+        }
         skincareRepository.deleteById(id);
     }
-
 
 }

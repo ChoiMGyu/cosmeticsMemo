@@ -1,13 +1,7 @@
 package com.example.groupProject.repository.memo;
 
 import com.example.groupProject.domain.memo.Skincare;
+import org.springframework.data.repository.CrudRepository;
 
-public interface SkincareRepository {
-    void save(Skincare skincare);
-
-    Skincare findById(Long id);
-
-    void delete(Skincare skincare);
-
-    void deleteById(Long id);
+public interface SkincareRepository extends CrudRepository<Skincare, Long> {
 }

@@ -1,6 +1,7 @@
 package com.example.groupProject.domain.memo;
 
 import com.example.groupProject.domain.user.User;
+import com.example.groupProject.dto.memo.SkincareDto;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.*;
@@ -32,4 +33,5 @@ public class Skincare extends Memo {
     private void initialMoisture(String moisture) {
         this.moisture = moisture;
     }
+
 }
