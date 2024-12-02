@@ -1,7 +1,7 @@
 package com.example.groupProject.repository.memo;
 
 import com.example.groupProject.domain.memo.Skincare;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface SkincareRepository extends CrudRepository<Skincare, Long> {
+public interface SkincareRepository extends JpaRepository<Skincare, Long> {
 }
