@@ -16,5 +16,5 @@ public interface SkincareService {
 
     void updateSkincareMemo(Long id, SkincareDto skincareDto);
 
-    List<Skincare> findAllSkincareMemo();
+    List<Skincare> findAllSkincareMemo(Long id);
 }
