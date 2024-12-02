@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,5 +97,37 @@ public class SkincareRepositoryTest {
         //then
         assertTrue(findSkincare.isPresent());
         assertThat(findSkincare.get()).isEqualTo(skincare);
+    }
+
+    @Test
+    @DisplayName("스킨케어 메모를 모두 찾아볼 수 있다")
+    public void 스킨케어_모두찾기() throws Exception
+    {
+        //given
+        Skincare skincare1 = Skincare.builder()
+                .start_date(LocalDate.now())
+                .name("기초케어 화장품")
+                .description("세안 후 첫 단계에 사용하는 화장품입니다.")
+                .area("얼굴")
+                .build();
+
+        Skincare skincare2 = Skincare.builder()
+                .start_date(LocalDate.now())
+                .name("헤어케어 화장품")
+                .description("세안 시 첫 단계에 사용하는 화장품입니다.")
+                .area("머리")
+                .build();
+
+        skincareRepository.save(skincare1);
+        skincareRepository.save(skincare2);
+        em.flush();
+        em.clear();
+
+        //when
+        List<Skincare> allSkincare = skincareRepository.findAll();
+
+        //then
+        assertThat(allSkincare).isNotNull();
+        assertThat(allSkincare.size()).isEqualTo(2);
     }
 }
