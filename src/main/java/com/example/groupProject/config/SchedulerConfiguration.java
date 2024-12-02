@@ -45,7 +45,7 @@ public class SchedulerConfiguration implements WebMvcConfigurer {
                 .withSchedule(
                         SimpleScheduleBuilder
                                 .simpleSchedule()
-                                .withIntervalInSeconds(10)
+                                .withIntervalInSeconds(100000000)
                                 .repeatForever())
                 .build();
 

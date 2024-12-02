@@ -80,7 +80,7 @@ public class SkincareServiceTest {
     }
 
     @Test
-    @DisplayName("스킨케어 메모를 모두 찾아온다")
+    @DisplayName("회원의 스킨케어 메모를 모두 찾아온다")
     public void 스킨케어_모두찾기() throws Exception {
         //given
         Skincare skincare1 = Skincare.builder()
@@ -98,10 +98,10 @@ public class SkincareServiceTest {
                 .build();
 
         List<Skincare> skincareList = List.of(skincare1, skincare2);
-        when(skincareRepository.findAll()).thenReturn(skincareList);
+        when(skincareRepository.findAllByIdFetchJoin(1L)).thenReturn(skincareList);
 
         //when
-        List<Skincare> allSkincare = skincareService.findAllSkincareMemo();
+        List<Skincare> allSkincare = skincareService.findAllSkincareMemo(1L);
 
         //then
         assertNotNull(allSkincare);

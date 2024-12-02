@@ -19,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -101,6 +102,4 @@ public class SkincareServiceTest {
         assertThatThrownBy(() -> skincareService.findById(skincare.getId()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
-
-
 }
