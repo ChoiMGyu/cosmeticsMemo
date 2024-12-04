@@ -2,8 +2,10 @@ package com.example.groupProject.controller.memo;
 
 import com.example.groupProject.controller.message.ErrorMessage;
 import com.example.groupProject.controller.validator.MemoApiValidator;
+import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
+import com.example.groupProject.dto.memo.SkincareAllDto;
 import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.memo.SkincareService;
@@ -16,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +37,25 @@ public class MemoApiController {
     private final SkincareService skincareService;
     private final UserServiceImpl userService;
     private final MemoApiValidator memoApiValidator;
+
+    @GetMapping("/skincare")
+    public ResponseEntity<SkincareAllDto> findAllSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        logger.info("MemoApiController - Skincare에 관련된 메모를 찾기");
+
+        if(customUserDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(SkincareAllDto.of(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage(), null, null, 0));
+        }
+
+        List<User> user = userService.findByAccount(customUserDetails.getUsername());
+
+        List<Skincare> allSkincareMemo = skincareService.findAllSkincareMemo(user.get(MEMO_WRITER).getId());
+
+        List<SkincareDto> allSkincareMemoDto = allSkincareMemo.stream()
+                .map(SkincareDto::from)
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.OK).body(SkincareAllDto.of(SUCCESS_FINDALL_SKINCARE_MEMO_MESSAGE, customUserDetails.getUsername(), allSkincareMemoDto, allSkincareMemo.size()));
+    }
 
     @PostMapping("/skincare")
     public ResponseEntity<String> createSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody SkincareDto skincareDto) {
