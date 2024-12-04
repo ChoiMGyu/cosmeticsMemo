@@ -59,7 +59,7 @@ public class SkincareServiceImpl implements SkincareService {
     }
 
     public List<Skincare> findAllSkincareMemo(Long id) {
-        List<Skincare> allSkincare = skincareRepository.findAllByIdFetchJoin(id);
+        List<Skincare> allSkincare = skincareRepository.findAllById(id);
         return allSkincare;
     }
 }

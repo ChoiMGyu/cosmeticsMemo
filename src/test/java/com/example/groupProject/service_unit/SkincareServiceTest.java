@@ -98,7 +98,7 @@ public class SkincareServiceTest {
                 .build();
 
         List<Skincare> skincareList = List.of(skincare1, skincare2);
-        when(skincareRepository.findAllByIdFetchJoin(1L)).thenReturn(skincareList);
+        when(skincareRepository.findAllById(1L)).thenReturn(skincareList);
 
         //when
         List<Skincare> allSkincare = skincareService.findAllSkincareMemo(1L);
@@ -109,7 +109,7 @@ public class SkincareServiceTest {
         assertTrue(allSkincare.contains(skincare1));
         assertTrue(allSkincare.contains(skincare2));
 
-        verify(skincareRepository, times(1)).findAllByIdFetchJoin(1L);
+        verify(skincareRepository, times(1)).findAllById(1L);
     }
 
 }
