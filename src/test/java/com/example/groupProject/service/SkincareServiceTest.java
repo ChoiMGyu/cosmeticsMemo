@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(SpringExtension.class)
@@ -102,4 +103,67 @@ public class SkincareServiceTest {
         assertThatThrownBy(() -> skincareService.findById(skincare.getId()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    @DisplayName("특정 회원이 작성한 스킨케어 메모를 모두 가져온다")
+    public void 특정회원_스킨케어_모두() throws Exception
+    {
+        //given
+        Skincare skincare1 = Skincare.builder()
+                .start_date(LocalDate.now())
+                .name("특수케어 화장품")
+                .description("세안 후 첫 단계에 사용하는 화장품입니다.")
+                .master(user)
+                .area("얼굴")
+                .build();
+
+        Skincare skincare2 = Skincare.builder()
+                .start_date(LocalDate.now())
+                .name("바디케어 화장품")
+                .description("세안 후 첫 단계에 사용하는 화장품입니다.")
+                .master(user)
+                .area("얼굴")
+                .build();
+        skincareService.saveSkincareMemo(SkincareDto.from(skincare1), user);
+        skincareService.saveSkincareMemo(SkincareDto.from(skincare2), user);
+
+        User user1 = User.createUser("accountTmp", "password", null, null, null, null, null);
+        userService.join(user1);
+        Skincare skincareTest1 = Skincare.builder()
+                .start_date(LocalDate.now())
+                .name("얼굴케어 화장품")
+                .description("세안 후 첫 단계에 사용하는 화장품입니다.")
+                .master(user1)
+                .area("얼굴")
+                .build();
+
+        Skincare skincareTest2 = Skincare.builder()
+                .start_date(LocalDate.now())
+                .name("몸케어 화장품")
+                .description("세안 후 첫 단계에 사용하는 화장품입니다.")
+                .master(user1)
+                .area("얼굴")
+                .build();
+
+        skincareService.saveSkincareMemo(SkincareDto.from(skincareTest1), user1);
+        skincareService.saveSkincareMemo(SkincareDto.from(skincareTest2), user1);
+
+        em.flush();
+        em.clear();
+
+        //when
+        List<Skincare> allSkincareMemo = skincareService.findAllSkincareMemo(user.getId());
+        List<Skincare> allSkincareMemo1 = skincareService.findAllSkincareMemo(user1.getId());
+//        for(Skincare skincareTmp : allSkincareMemo) {
+//            System.out.println(skincareTmp.getMaster().getAccount());
+//        }
+//        for(Skincare skincareTmp : allSkincareMemo1) {
+//            System.out.println(skincareTmp.getMaster().getAccount());
+//        }
+
+        //then
+        assertThat(allSkincareMemo.size()).isEqualTo(3);
+        assertThat(allSkincareMemo1.size()).isEqualTo(2);
+    }
+
 }
