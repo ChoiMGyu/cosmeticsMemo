@@ -10,5 +10,5 @@ import java.util.List;
 public interface SkincareRepository extends JpaRepository<Skincare, Long> {
 
     @Query("SELECT s FROM Skincare s WHERE s.master.id = :id")
-    List<Skincare> findAllByIdFetchJoin(@Param("id") Long id);
+    List<Skincare> findAllById(@Param("id") Long id);
 }
