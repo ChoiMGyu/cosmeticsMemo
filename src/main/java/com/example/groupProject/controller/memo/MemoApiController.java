@@ -13,6 +13,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,22 +42,20 @@ public class MemoApiController {
     private final MemoApiValidator memoApiValidator;
 
     @GetMapping("/skincare")
-    public ResponseEntity<SkincareAllDto> findAllSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<SkincareAllDto> findAllSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                              @RequestParam(value = "page", defaultValue = "0") int page,
+                                                              @RequestParam(value = "size", defaultValue = "5") int size) {
         logger.info("MemoApiController - Skincare에 관련된 메모를 찾기");
 
         if(customUserDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(SkincareAllDto.of(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage(), null, null, 0));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(SkincareAllDto.of(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage(), null, null));
         }
 
         List<User> user = userService.findByAccount(customUserDetails.getUsername());
 
-        List<Skincare> allSkincareMemo = skincareService.findAllSkincareMemo(user.get(MEMO_WRITER).getId());
+        Page<SkincareDto> skincareMemoPage = skincareService.findAllSkincareMemoStartDatePage(user.get(MEMO_WRITER).getId(), page, size);
 
-        List<SkincareDto> allSkincareMemoDto = allSkincareMemo.stream()
-                .map(SkincareDto::from)
-                .toList();
-
-        return ResponseEntity.status(HttpStatus.OK).body(SkincareAllDto.of(SUCCESS_FINDALL_SKINCARE_MEMO_MESSAGE, customUserDetails.getUsername(), allSkincareMemoDto, allSkincareMemo.size()));
+        return ResponseEntity.status(HttpStatus.OK).body(SkincareAllDto.of(SUCCESS_FINDALL_SKINCARE_MEMO_MESSAGE, customUserDetails.getUsername(), skincareMemoPage.getContent()));
     }
 
     @PostMapping("/skincare")
