@@ -13,8 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.awt.print.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -110,6 +112,42 @@ public class SkincareServiceTest {
         assertTrue(allSkincare.contains(skincare2));
 
         verify(skincareRepository, times(1)).findAllById(1L);
+    }
+
+    @Test
+    @DisplayName("스킨케어를 페이징하여 반환한다")
+    public void 스킨케어_페이징() throws Exception
+    {
+        //given
+        Skincare skincare1 = Skincare.builder()
+                .start_date(LocalDate.now().plusDays(1))
+                .name("기초케어 화장품 1")
+                .description("세안 후 첫 단계에 사용하는 화장품입니다.")
+                .area("얼굴")
+                .build();
+
+        Skincare skincare2 = Skincare.builder()
+                .start_date(LocalDate.now().plusDays(2))
+                .name("기초케어 화장품 2")
+                .description("세안 후 두 번째 단계에 사용하는 화장품입니다.")
+                .area("얼굴")
+                .build();
+
+        List<Skincare> allSkincare = List.of(skincare, skincare1, skincare2);
+
+        when(skincareRepository.findALLByIdPaging(anyLong(), any(PageRequest.class)))
+                .thenReturn(allSkincare);
+
+        //when
+        PageRequest pageRequest = PageRequest.of(0, 2);
+        List<Skincare> firstPage = skincareService.paging(1L, pageRequest);
+
+
+        //then
+        assertNotNull(firstPage);
+        assertEquals(2, firstPage.size());
+        assertTrue(firstPage.contains(skincare));
+        assertTrue(firstPage.contains(skincare1));
     }
 
 }
