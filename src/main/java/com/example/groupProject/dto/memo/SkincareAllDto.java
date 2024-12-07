@@ -11,9 +11,8 @@ public class SkincareAllDto {
     private String message;
     private String writer;
     private List<SkincareDto> skincareDto;
-    private int count;
 
-    public static SkincareAllDto of(String message, String writer, List<SkincareDto> skincareDto, int count) {
-        return new SkincareAllDto(message, writer, skincareDto, count);
+    public static SkincareAllDto of(String message, String writer, List<SkincareDto> skincareDto) {
+        return new SkincareAllDto(message, writer, skincareDto);
     }
 }
