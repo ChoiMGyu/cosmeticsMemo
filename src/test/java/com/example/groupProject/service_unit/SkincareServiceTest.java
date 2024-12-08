@@ -5,6 +5,7 @@ import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.repository.memo.SkincareRepository;
 import com.example.groupProject.service.memo.SkincareServiceImpl;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,13 +14,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.awt.print.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -82,39 +86,6 @@ public class SkincareServiceTest {
     }
 
     @Test
-    @DisplayName("회원의 스킨케어 메모를 모두 찾아온다")
-    public void 스킨케어_모두찾기() throws Exception {
-        //given
-        Skincare skincare1 = Skincare.builder()
-                .start_date(LocalDate.now())
-                .name("기초케어 화장품 1")
-                .description("세안 후 첫 단계에 사용하는 화장품입니다.")
-                .area("얼굴")
-                .build();
-
-        Skincare skincare2 = Skincare.builder()
-                .start_date(LocalDate.now())
-                .name("기초케어 화장품 2")
-                .description("세안 후 두 번째 단계에 사용하는 화장품입니다.")
-                .area("얼굴")
-                .build();
-
-        List<Skincare> skincareList = List.of(skincare1, skincare2);
-        when(skincareRepository.findAllById(1L)).thenReturn(skincareList);
-
-        //when
-        List<Skincare> allSkincare = skincareService.findAllSkincareMemo(1L);
-
-        //then
-        assertNotNull(allSkincare);
-        assertEquals(2, allSkincare.size());
-        assertTrue(allSkincare.contains(skincare1));
-        assertTrue(allSkincare.contains(skincare2));
-
-        verify(skincareRepository, times(1)).findAllById(1L);
-    }
-
-    @Test
     @DisplayName("스킨케어를 페이징하여 반환한다")
     public void 스킨케어_페이징() throws Exception
     {
@@ -133,21 +104,21 @@ public class SkincareServiceTest {
                 .area("얼굴")
                 .build();
 
-        List<Skincare> allSkincare = List.of(skincare, skincare1, skincare2);
+        PageRequest pageRequest = PageRequest.of(0, 2);
+        Page<Skincare> page = new PageImpl<>(List.of(skincare, skincare1), pageRequest, 2);
 
-        when(skincareRepository.findALLByIdPaging(anyLong(), any(PageRequest.class)))
-                .thenReturn(allSkincare);
+        when(skincareRepository.findAllByIdPaging(anyLong(), eq(pageRequest)))
+                .thenReturn(page);
 
         //when
-        PageRequest pageRequest = PageRequest.of(0, 2);
-        List<Skincare> firstPage = skincareService.paging(1L, pageRequest);
+        Page<SkincareDto> resultPage = skincareService.findAllSkincareMemoStartDatePage(1L, 0, 2);
 
 
         //then
-        assertNotNull(firstPage);
-        assertEquals(2, firstPage.size());
-        assertTrue(firstPage.contains(skincare));
-        assertTrue(firstPage.contains(skincare1));
+        assertNotNull(resultPage);
+        assertThat(resultPage.getContent().size()).isEqualTo(2);
+        assertThat(resultPage.getContent().get(0).getName()).isEqualTo(skincare.getName());
+        assertThat(resultPage.getContent().get(1).getName()).isEqualTo(skincare1.getName());
     }
 
 }
