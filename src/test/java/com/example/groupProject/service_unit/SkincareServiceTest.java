@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,6 +56,7 @@ public class SkincareServiceTest {
                 .description("세안 후 첫 단계에 사용하는 화장품입니다.")
                 .master(user)
                 .area("얼굴")
+                .moisture("촉촉함")
                 .build());
     }
 
@@ -85,40 +89,63 @@ public class SkincareServiceTest {
         verify(skincareRepository, times(1)).deleteById(skincareId);
     }
 
-    @Test
-    @DisplayName("스킨케어를 페이징하여 반환한다")
-    public void 스킨케어_페이징() throws Exception
+    @ParameterizedTest
+    @DisplayName("스킨케어를 정렬 기준에 따라 페이징하여 반환한다")
+    @CsvSource({
+            "start_date, 기초케어 화장품, 기초케어 화장품 1",
+            "end_date, 기초케어 화장품, 기초케어 화장품 1",
+            "area, 기초케어 화장품 1, 기초케어 화장품 2",
+            "moisture, 기초케어 화장품 1, 기초케어 화장품 2"
+    })
+    public void 정렬기준_스킨케어_페이징(String sortBy, String expectedFirst, String expectedSecond) throws Exception
     {
         //given
         Skincare skincare1 = Skincare.builder()
                 .start_date(LocalDate.now().plusDays(1))
                 .name("기초케어 화장품 1")
                 .description("세안 후 첫 단계에 사용하는 화장품입니다.")
-                .area("얼굴")
+                .area("몸")
+                .moisture("유분기 적음")
                 .build();
 
         Skincare skincare2 = Skincare.builder()
                 .start_date(LocalDate.now().plusDays(2))
                 .name("기초케어 화장품 2")
                 .description("세안 후 두 번째 단계에 사용하는 화장품입니다.")
-                .area("얼굴")
+                .area("머리")
+                .moisture("유분기 많음")
                 .build();
 
-        PageRequest pageRequest = PageRequest.of(0, 2);
-        Page<Skincare> page = new PageImpl<>(List.of(skincare, skincare1), pageRequest, 2);
+        List<Skincare> skincareMemos = List.of(skincare, skincare1, skincare2);
 
-        when(skincareRepository.findAllByIdPaging(anyLong(), eq(pageRequest)))
-                .thenReturn(page);
+        when(skincareRepository.findAllByPaging(anyLong(), any(PageRequest.class)), anyString()).thenAnswer(invocation -> {
+            PageRequest pageRequest = invocation.getArgument(1);
+            Comparator<Skincare> comparator = switch (sortBy) {
+                case "start_date" -> Comparator.comparing(Skincare::getStart_date);
+                case "end_date" -> Comparator.comparing(Skincare::getEnd_date);
+                case "area" -> Comparator.comparing(Skincare::getArea);
+                case "moisture" -> Comparator.comparing(Skincare::getMoisture);
+                default -> throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.");
+            }
+            List<Skincare> sortedSkincareMemos = skincareMemos.stream()
+                    .sorted(comparator)
+                    .toList();
+
+            int start = (int) pageRequest.getOffset();
+            int end = Math.min((start + pageRequest.getPageSize()), sortedSkincareMemos.size());
+            return new PageImpl<>(sortedSkincareMemos.subList(start, end), pageRequest, skincareMemos.size());
+        });
+
 
         //when
-        Page<SkincareDto> resultPage = skincareService.findAllSkincareMemoStartDatePage(1L, 0, 2);
+        Page<SkincareDto> resultPage = skincareService.findAllSkincareMemoPagingByUserId(1L, 0, 2, sortBy);
 
 
         //then
         assertNotNull(resultPage);
         assertThat(resultPage.getContent().size()).isEqualTo(2);
-        assertThat(resultPage.getContent().get(0).getName()).isEqualTo(skincare.getName());
-        assertThat(resultPage.getContent().get(1).getName()).isEqualTo(skincare1.getName());
+        assertThat(resultPage.getContent().get(0).getName()).isEqualTo(expectedFirst);
+        assertThat(resultPage.getContent().get(1).getName()).isEqualTo(expectedSecond);
     }
 
 }
