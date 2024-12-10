@@ -4,10 +4,12 @@ import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.repository.memo.SkincareRepository;
+import com.example.groupProject.repository.memo.SkincareSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,9 +64,14 @@ public class SkincareServiceImpl implements SkincareService {
     }
 
     @Override
-    public Page<SkincareDto> findAllSkincareMemoStartDatePage(Long id, int page, int size) {
+    public Page<SkincareDto> findAllSkincareMemoPagingByUserId(Long id, int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Skincare> skincareMemoPaging = skincareRepository.findAllByIdPaging(id, pageable);
+
+        Specification<Skincare> spec = Specification.where(SkincareSpecifications.withUserId(id))
+                .and(SkincareSpecifications.sortBy(sortBy));
+
+        Page<Skincare> skincareMemoPaging = skincareRepository.findAll(spec, pageable);
+
         return skincareMemoPaging.map(SkincareDto::from);
     }
 
