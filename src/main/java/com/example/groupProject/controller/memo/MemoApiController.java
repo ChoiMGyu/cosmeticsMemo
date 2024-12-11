@@ -44,7 +44,8 @@ public class MemoApiController {
     @GetMapping("/skincare")
     public ResponseEntity<SkincareAllDto> findAllSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                               @RequestParam(value = "page", defaultValue = "0") int page,
-                                                              @RequestParam(value = "size", defaultValue = "5") int size) {
+                                                              @RequestParam(value = "size", defaultValue = "5") int size,
+                                                              @RequestParam(value = "sortBy", defaultValue = "start_date") String sortBy) {
         logger.info("MemoApiController - Skincare에 관련된 메모를 찾기");
 
         if(customUserDetails == null) {
@@ -53,7 +54,7 @@ public class MemoApiController {
 
         List<User> user = userService.findByAccount(customUserDetails.getUsername());
 
-        Page<SkincareDto> skincareMemoPage = skincareService.findAllSkincareMemoStartDatePage(user.get(MEMO_WRITER).getId(), page, size);
+        Page<SkincareDto> skincareMemoPage = skincareService.findAllSkincareMemoPagingByUserId(user.get(MEMO_WRITER).getId(), page, size, sortBy);
 
         return ResponseEntity.status(HttpStatus.OK).body(SkincareAllDto.of(SUCCESS_FINDALL_SKINCARE_MEMO_MESSAGE, customUserDetails.getUsername(), skincareMemoPage.getContent()));
     }
