@@ -4,7 +4,6 @@ import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.memo.SkincareDto;
 import com.example.groupProject.repository.memo.SkincareRepository;
-import com.example.groupProject.repository.memo.SkincareSpecifications;
 import com.example.groupProject.service.memo.SkincareServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -99,8 +98,7 @@ public class SkincareServiceTest {
             "area, 기초케어 화장품 2, 기초케어 화장품 1",
             "moisture, 기초케어 화장품 2, 기초케어 화장품 1"
     })
-    public void 정렬기준_스킨케어_페이징(String sortBy, String expectedFirst, String expectedSecond) throws Exception
-    {
+    public void 정렬기준_스킨케어_페이징(String sortBy, String expectedFirst, String expectedSecond) throws Exception {
         //given
         Skincare skincare1 = Skincare.builder()
                 .start_date(LocalDate.now().plusDays(1))
@@ -126,7 +124,7 @@ public class SkincareServiceTest {
                     Specification<Skincare> specification = invocation.getArgument(0);
                     Comparator<Skincare> comparator = switch (sortBy) {
                         case "start_date" -> Comparator.comparing(Skincare::getStart_date);
-                        case "end_date" -> Comparator.comparing(Skincare::getStart_date);
+                        case "end_date" -> Comparator.comparing(Skincare::getEnd_date);
                         case "area" -> Comparator.comparing(Skincare::getArea);
                         case "moisture" -> Comparator.comparing(Skincare::getMoisture);
                         default -> throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.");

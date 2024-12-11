@@ -149,8 +149,7 @@ public class SkincareControllerTest {
                 .sorted(comparator)
                 .collect(Collectors.toList());
 
-        Page<SkincareDto> skincarePage = new PageImpl<>(sortedSkincareDtoMemos.subList(0,2));
-        System.out.println("null판단::" + sortBy);
+        Page<SkincareDto> skincarePage = new PageImpl<>(sortedSkincareDtoMemos.subList(0, 2));
 
         when(userService.findByAccount(Mockito.anyString()))
                 .thenReturn(List.of(user));
