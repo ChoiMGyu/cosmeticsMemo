@@ -12,6 +12,12 @@ public class SkincareSpecifications {
         };
     }
 
+    public static Specification<Skincare> withNotDeleted() {
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.get("deleted"), false);
+        };
+    }
+
     public static Specification<Skincare> sortBy(String sortBy) {
         return (root, query, criteriaBuilder) -> {
             if (sortBy != null) {
