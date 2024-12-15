@@ -21,4 +21,6 @@ public interface SkincareService {
     Page<SkincareDto> findAllSkincareMemoPagingByUserId(Long id, int page, int size, String sortBy);
 
     void trashSkincareMemo(Long id);
+
+    void recoverSkincareMemo(Long id);
 }

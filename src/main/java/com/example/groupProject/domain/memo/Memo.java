@@ -62,4 +62,8 @@ public abstract class Memo {
     public void moveToTrash() {
         this.deleted = true;
     }
+
+    public void moveToRecover() {
+        this.deleted = false;
+    }
 }
