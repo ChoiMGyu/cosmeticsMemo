@@ -57,6 +57,7 @@ public class SkincareServiceImpl implements SkincareService {
     }
 
     @Override
+    @Transactional
     public void trashSkincareMemo(Long id) {
         Skincare findSkincare = skincareRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_MEMO));
@@ -76,7 +77,8 @@ public class SkincareServiceImpl implements SkincareService {
         Pageable pageable = PageRequest.of(page, size);
 
         Specification<Skincare> spec = Specification.where(SkincareSpecifications.withUserId(id))
-                .and(SkincareSpecifications.sortBy(sortBy));
+                .and(SkincareSpecifications.sortBy(sortBy))
+                .and(SkincareSpecifications.withNotDeleted());
 
         Page<Skincare> skincareMemoPaging = skincareRepository.findAll(spec, pageable);
 
