@@ -114,7 +114,6 @@ public class SkincareServiceTest {
                 .name("기초케어 화장품 2")
                 .description("세안 후 두 번째 단계에 사용하는 화장품입니다.")
                 .area("머리")
-                .moisture("유분기 많음")
                 .build();
 
         List<Skincare> skincareMemos = List.of(skincare, skincare1, skincare2);
@@ -126,8 +125,8 @@ public class SkincareServiceTest {
                     Comparator<Skincare> comparator = switch (sortBy) {
                         case "start_date" -> Comparator.comparing(Skincare::getStart_date);
                         case "end_date" -> Comparator.comparing(Skincare::getEnd_date);
-                        case "area" -> Comparator.comparing(Skincare::getArea);
-                        case "moisture" -> Comparator.comparing(Skincare::getMoisture);
+                        case "area" -> Comparator.comparing(Skincare::getArea, Comparator.nullsFirst(String::compareTo));
+                        case "moisture" -> Comparator.comparing(Skincare::getMoisture, Comparator.nullsFirst(String::compareTo));
                         default -> throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.");
                     };
 
