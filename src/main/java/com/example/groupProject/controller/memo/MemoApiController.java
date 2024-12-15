@@ -2,7 +2,6 @@ package com.example.groupProject.controller.memo;
 
 import com.example.groupProject.controller.message.ErrorMessage;
 import com.example.groupProject.controller.validator.MemoApiValidator;
-import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
 import com.example.groupProject.dto.memo.SkincareAllDto;
@@ -14,16 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,6 +29,7 @@ public class MemoApiController {
     private static final String SUCCESS_CREATE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 저장되었습니다.";
     private static final String SUCCESS_DELETE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 삭제되었습니다.";
     private static final String SUCCESS_SOFT_DELETE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 휴지통으로 이동되었습니다.";
+    private static final String SUCCESS_RECOVER_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 복구되었습니다.";
     private static final String SUCCESS_UPDATE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 수정되었습니다.";
 
     private static final Logger logger = LoggerFactory.getLogger(MemoApiController.class);
@@ -49,7 +45,7 @@ public class MemoApiController {
                                                               @RequestParam(value = "sortBy", defaultValue = "start_date") String sortBy) {
         logger.info("MemoApiController - Skincare에 관련된 메모를 찾기");
 
-        if(customUserDetails == null) {
+        if (customUserDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(SkincareAllDto.of(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage(), null, null));
         }
 
@@ -93,18 +89,32 @@ public class MemoApiController {
         return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_DELETE_SKINCARE_MEMO_MESSAGE);
     }
 
-    @PatchMapping("/skincare")
+    @PatchMapping("/skincare/trash")
     public ResponseEntity<String> softDeleteSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                          @RequestParam(value = "id") Long id) {
         logger.info("MemoApiController - Skincare에 관련된 메모를 휴지통으로 이동");
 
-        if(customUserDetails == null) {
+        if (customUserDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage());
         }
 
         skincareService.trashSkincareMemo(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_SOFT_DELETE_SKINCARE_MEMO_MESSAGE);
+    }
+
+    @PatchMapping("/skincare/recover")
+    public ResponseEntity<String> recoverSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                      @RequestParam(value = "id") Long id) {
+        logger.info("MemoApiController - Skincare에 관련된 메모를 휴지통으로부터 복구");
+
+        if (customUserDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage());
+        }
+
+        skincareService.recoverSkincareMemo(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_RECOVER_SKINCARE_MEMO_MESSAGE);
     }
 
     @PutMapping("/skincare")

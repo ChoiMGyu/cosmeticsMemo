@@ -66,6 +66,14 @@ public class SkincareServiceImpl implements SkincareService {
 
     @Override
     @Transactional
+    public void recoverSkincareMemo(Long id) {
+        Skincare findSkincare = skincareRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_MEMO));
+        findSkincare.moveToRecover();
+    }
+
+    @Override
+    @Transactional
     public void updateSkincareMemo(Long id, SkincareDto skincareDto) {
         Skincare findSkincare = skincareRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_MEMO));
