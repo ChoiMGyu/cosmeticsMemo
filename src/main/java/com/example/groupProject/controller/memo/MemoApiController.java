@@ -33,6 +33,7 @@ public class MemoApiController {
     private static final String SUCCESS_FINDALL_SKINCARE_MEMO_MESSAGE = "스킨케어 메모를 모두 찾아왔습니다.";
     private static final String SUCCESS_CREATE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 저장되었습니다.";
     private static final String SUCCESS_DELETE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 삭제되었습니다.";
+    private static final String SUCCESS_SOFT_DELETE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 휴지통으로 이동되었습니다.";
     private static final String SUCCESS_UPDATE_SKINCARE_MEMO_MESSAGE = "스킨케어 메모가 수정되었습니다.";
 
     private static final Logger logger = LoggerFactory.getLogger(MemoApiController.class);
@@ -90,6 +91,20 @@ public class MemoApiController {
         skincareService.deleteByIdSkincareMemo(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_DELETE_SKINCARE_MEMO_MESSAGE);
+    }
+
+    @PatchMapping("/skincare")
+    public ResponseEntity<String> softDeleteSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                         @RequestParam(value = "id") Long id) {
+        logger.info("MemoApiController - Skincare에 관련된 메모를 휴지통으로 이동");
+
+        if(customUserDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage());
+        }
+
+        skincareService.trashSkincareMemo(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_SOFT_DELETE_SKINCARE_MEMO_MESSAGE);
     }
 
     @PutMapping("/skincare")
