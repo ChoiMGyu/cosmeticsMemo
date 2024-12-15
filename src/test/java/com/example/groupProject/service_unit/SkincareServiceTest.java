@@ -157,15 +157,14 @@ public class SkincareServiceTest {
     public void 메모_휴지통이동() throws Exception
     {
         //given
-        when(skincareRepository.existsById(anyLong())).thenReturn(true);
         when(skincareRepository.findById(anyLong())).thenReturn(Optional.of(skincare));
+        assertThat(skincare.getDeleted()).isEqualTo(false);
 
         //when
         skincareService.trashSkincareMemo(anyLong());
 
         //then
-        assertThat(skincare.isDeleted()).isEqualTo(true);
-        verify(skincareRepository, times(1)).existsById(anyLong());
+        assertThat(skincare.getDeleted()).isEqualTo(true);
         verify(skincareRepository, times(1)).findById(anyLong());
     }
 
