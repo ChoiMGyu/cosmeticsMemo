@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -150,4 +151,22 @@ public class SkincareServiceTest {
         assertThat(resultPage.getContent().get(0).getName()).isEqualTo(expectedFirst);
         assertThat(resultPage.getContent().get(1).getName()).isEqualTo(expectedSecond);
     }
+
+    @Test
+    @DisplayName("스킨케어 메모를 휴지통(soft delete)으로 이동한다")
+    public void 메모_휴지통이동() throws Exception
+    {
+        //given
+        when(skincareRepository.existsById(anyLong())).thenReturn(true);
+        when(skincareRepository.findById(anyLong())).thenReturn(Optional.of(skincare));
+
+        //when
+        skincareService.trashSkincareMemo(anyLong());
+
+        //then
+        assertThat(skincare.isDeleted()).isEqualTo(true);
+        verify(skincareRepository, times(1)).existsById(anyLong());
+        verify(skincareRepository, times(1)).findById(anyLong());
+    }
+
 }
