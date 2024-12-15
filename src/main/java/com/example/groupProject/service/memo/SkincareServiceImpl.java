@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +54,13 @@ public class SkincareServiceImpl implements SkincareService {
             throw new IllegalArgumentException(NOT_EXIST_MEMO);
         }
         skincareRepository.deleteById(id);
+    }
+
+    @Override
+    public void trashSkincareMemo(Long id) {
+        Skincare findSkincare = skincareRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_MEMO));
+        findSkincare.moveToTrash();
     }
 
     @Override

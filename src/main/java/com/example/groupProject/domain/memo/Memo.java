@@ -29,21 +29,21 @@ public abstract class Memo {
 
     private String description; //부가 설명
 
+    private Boolean deleted = Boolean.FALSE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_id")
     private User master;
 
     protected Memo(LocalDate start_date, LocalDate end_date, String name, String description, User master) {
         this.start_date = start_date != null ? start_date : LocalDate.now();
-        if(end_date == null) {
-            if(start_date == null) {
+        if (end_date == null) {
+            if (start_date == null) {
                 this.end_date = LocalDate.now().plusMonths(INITIAL_END_DATE);
-            }
-            else {
+            } else {
                 this.end_date = start_date.plusMonths(INITIAL_END_DATE);
             }
-        }
-        else {
+        } else {
             this.end_date = end_date;
         }
         this.name = name;
@@ -57,5 +57,9 @@ public abstract class Memo {
         this.start_date = start_date;
         this.name = name;
         this.description = description;
+    }
+
+    public void moveToTrash() {
+        this.deleted = true;
     }
 }
