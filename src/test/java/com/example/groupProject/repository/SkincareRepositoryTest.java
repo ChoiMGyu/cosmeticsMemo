@@ -90,7 +90,7 @@ public class SkincareRepositoryTest {
 
         //when
         Pageable pageable = PageRequest.of(0, 2);
-        Specification<Skincare> spec = Specification.where(SkincareSpecifications.withUserId(testUser.getId()))
+        Specification<Skincare> spec = Specification.where(SkincareSpecifications.withMasterId(testUser.getId()))
                 .and(SkincareSpecifications.sortBy(sortBy));
 
         Page<Skincare> skincarePage = skincareRepository.findAll(spec, pageable);

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class SkincareSpecifications {
 
-    public static Specification<Skincare> withUserId(Long id) {
+    public static Specification<Skincare> withMasterId(Long id) {
         return (root, query, criteriaBuilder) -> {
             query.orderBy(criteriaBuilder.asc(root.get("start_date")));
             return criteriaBuilder.equal(root.get("master").get("id"), id);
