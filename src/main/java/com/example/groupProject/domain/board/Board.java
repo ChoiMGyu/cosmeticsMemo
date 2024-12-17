@@ -35,4 +35,9 @@ public class Board {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_id")
     private User master;
+
+    public void changeBoard(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }
