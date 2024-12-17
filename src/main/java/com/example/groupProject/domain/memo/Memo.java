@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @DiscriminatorColumn(name = "dtype")
 public abstract class Memo {
     private static final int INITIAL_END_DATE = 6;
+    private static final int HARD_DELETE_DAYS = 30;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +31,8 @@ public abstract class Memo {
     private String description; //부가 설명
 
     private Boolean deleted = Boolean.FALSE;
+
+    private LocalDate trashTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_id")
@@ -61,9 +64,15 @@ public abstract class Memo {
 
     public void moveToTrash() {
         this.deleted = true;
+        this.trashTime = LocalDate.now();
     }
 
     public void moveToRecover() {
         this.deleted = false;
+        this.trashTime = null;
+    }
+
+    public boolean isOverdueInTrash() {
+        return deleted && trashTime != null && trashTime.plusDays(HARD_DELETE_DAYS).isBefore(LocalDate.now());
     }
 }
