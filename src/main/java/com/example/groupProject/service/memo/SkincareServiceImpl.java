@@ -3,6 +3,7 @@ package com.example.groupProject.service.memo;
 import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.memo.SkincareDto;
+import com.example.groupProject.dto.memo.SkincarePageDto;
 import com.example.groupProject.repository.memo.SkincareRepository;
 import com.example.groupProject.repository.memo.SkincareSpecifications;
 import lombok.RequiredArgsConstructor;
@@ -42,9 +43,10 @@ public class SkincareServiceImpl implements SkincareService {
     }
 
     @Override
-    public Skincare findById(Long id) {
-        return skincareRepository.findById(id)
+    public SkincareDto findById(Long id) {
+        Skincare findSkincare = skincareRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_MEMO));
+        return SkincareDto.from(findSkincare);
     }
 
     @Override
@@ -81,11 +83,11 @@ public class SkincareServiceImpl implements SkincareService {
     }
 
     @Override
-    public Page<SkincareDto> findAllSkincareMemoPagingByUserId(Long id, int page, int size, String sortBy) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<SkincareDto> findAllSkincareMemoPagingByUserId(SkincarePageDto skincarePageDto) {
+        Pageable pageable = PageRequest.of(skincarePageDto.getPage(), skincarePageDto.getSize());
 
-        Specification<Skincare> spec = Specification.where(SkincareSpecifications.withUserId(id))
-                .and(SkincareSpecifications.sortBy(sortBy))
+        Specification<Skincare> spec = Specification.where(SkincareSpecifications.withUserId(skincarePageDto.getMasterId()))
+                .and(SkincareSpecifications.sortBy(skincarePageDto.getSortBy()))
                 .and(SkincareSpecifications.withNotDeleted());
 
         Page<Skincare> skincareMemoPaging = skincareRepository.findAll(spec, pageable);

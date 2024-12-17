@@ -6,6 +6,7 @@ import com.example.groupProject.controller.validator.MemoApiValidator;
 import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.memo.SkincareDto;
+import com.example.groupProject.dto.memo.SkincarePageDto;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.memo.SkincareService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -151,9 +152,16 @@ public class SkincareControllerTest {
 
         Page<SkincareDto> skincarePage = new PageImpl<>(sortedSkincareDtoMemos.subList(0, 2));
 
+        SkincarePageDto skincarePageDto = SkincarePageDto.builder()
+                .masterId(user.getId())
+                .page(0)
+                .size(2)
+                .sortBy(sortBy)
+                .build();
+
         when(userService.findByAccount(Mockito.anyString()))
                 .thenReturn(List.of(user));
-        when(skincareService.findAllSkincareMemoPagingByUserId(eq(user.getId()), eq(0), eq(2), eq(sortBy)))
+        when(skincareService.findAllSkincareMemoPagingByUserId(eq(skincarePageDto)))
                 .thenReturn(skincarePage);
 
         //when

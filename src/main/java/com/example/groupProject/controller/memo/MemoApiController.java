@@ -6,6 +6,7 @@ import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
 import com.example.groupProject.dto.memo.SkincareAllDto;
 import com.example.groupProject.dto.memo.SkincareDto;
+import com.example.groupProject.dto.memo.SkincarePageDto;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.memo.SkincareService;
 import jakarta.validation.Valid;
@@ -51,7 +52,14 @@ public class MemoApiController {
 
         List<User> user = userService.findByAccount(customUserDetails.getUsername());
 
-        Page<SkincareDto> skincareMemoPage = skincareService.findAllSkincareMemoPagingByUserId(user.get(MEMO_WRITER).getId(), page, size, sortBy);
+        SkincarePageDto skincarePageDto = SkincarePageDto.builder()
+                .masterId(user.get(MEMO_WRITER).getId())
+                .page(page)
+                .size(size)
+                .sortBy(sortBy)
+                .build();
+
+        Page<SkincareDto> skincareMemoPage = skincareService.findAllSkincareMemoPagingByUserId(skincarePageDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(SkincareAllDto.of(SUCCESS_FINDALL_SKINCARE_MEMO_MESSAGE, customUserDetails.getUsername(), skincareMemoPage.getContent()));
     }

@@ -3,6 +3,7 @@ package com.example.groupProject.service_unit;
 import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.memo.SkincareDto;
+import com.example.groupProject.dto.memo.SkincarePageDto;
 import com.example.groupProject.repository.memo.SkincareRepository;
 import com.example.groupProject.service.memo.SkincareServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,7 +142,14 @@ public class SkincareServiceTest {
 
 
         //when
-        Page<SkincareDto> resultPage = skincareService.findAllSkincareMemoPagingByUserId(1L, 0, 2, sortBy);
+        SkincarePageDto skincarePageDto = SkincarePageDto.builder()
+                .masterId(1L)
+                .page(0)
+                .size(2)
+                .sortBy(sortBy)
+                .build();
+
+        Page<SkincareDto> resultPage = skincareService.findAllSkincareMemoPagingByUserId(skincarePageDto);
 
 
         //then
