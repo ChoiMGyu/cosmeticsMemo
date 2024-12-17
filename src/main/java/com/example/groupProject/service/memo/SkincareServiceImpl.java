@@ -86,7 +86,7 @@ public class SkincareServiceImpl implements SkincareService {
     public Page<SkincareDto> findAllSkincareMemoPagingByUserId(SkincarePageDto skincarePageDto) {
         Pageable pageable = PageRequest.of(skincarePageDto.getPage(), skincarePageDto.getSize());
 
-        Specification<Skincare> spec = Specification.where(SkincareSpecifications.withUserId(skincarePageDto.getMasterId()))
+        Specification<Skincare> spec = Specification.where(SkincareSpecifications.withMasterId(skincarePageDto.getMasterId()))
                 .and(SkincareSpecifications.sortBy(skincarePageDto.getSortBy()))
                 .and(SkincareSpecifications.withNotDeleted());
 
