@@ -42,7 +42,7 @@ public class SkincareServiceTest {
     private SkincareRepository skincareRepository;
 
     @InjectMocks
-    SkincareServiceImpl skincareService;
+    private SkincareServiceImpl skincareService;
 
     private User user;
 
