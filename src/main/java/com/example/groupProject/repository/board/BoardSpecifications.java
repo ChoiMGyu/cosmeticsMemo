@@ -23,10 +23,10 @@ public class BoardSpecifications {
                         query.orderBy(criteriaBuilder.desc(root.get("hit")));
                         break;
                     case "like":
-                        query.orderBy(criteriaBuilder.asc(root.get("like")));
+                        query.orderBy(criteriaBuilder.desc(root.get("like")));
                         break;
                     default:
-                        query.orderBy(criteriaBuilder.asc(root.get("id")));
+                        query.orderBy(criteriaBuilder.desc(root.get("id")));
                 }
             }
             return null;
