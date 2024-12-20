@@ -58,7 +58,7 @@ public class BoardServiceTest {
                 .content("게시글 내용")
                 .like(0)
                 .hit(0)
-                .register(LocalDate.now())
+                .createdAt(LocalDate.now())
                 .master(user)
                 .build());
     }
@@ -109,7 +109,7 @@ public class BoardServiceTest {
                 .content("안녕하세요.처음 뵙겠습니다.")
                 .like(2)
                 .hit(2)
-                .register(LocalDate.now().minusMonths(1))
+                .createdAt(LocalDate.now().minusMonths(1))
                 .build();
 
         Board board2 = Board.builder()
@@ -117,7 +117,7 @@ public class BoardServiceTest {
                 .content("Hi")
                 .like(1)
                 .hit(1)
-                .register(LocalDate.now().minusDays(1))
+                .createdAt(LocalDate.now().minusDays(1))
                 .build();
 
         List<Board> boards = List.of(board, board1, board2);
@@ -127,7 +127,7 @@ public class BoardServiceTest {
                 .thenAnswer(invocation -> {
                     Specification<Skincare> specification = invocation.getArgument(0);
                     Comparator<Board> comparator = switch (sortBy) {
-                        case "register" -> Comparator.comparing(Board::getRegister).reversed();
+                        case "createdAt" -> Comparator.comparing(Board::getCreatedAt).reversed();
                         case "hit" -> Comparator.comparing(Board::getHit).reversed();
                         case "like" -> Comparator.comparing(Board::getLike).reversed();
                         default -> throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.");

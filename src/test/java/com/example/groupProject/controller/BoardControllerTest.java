@@ -1,6 +1,7 @@
 package com.example.groupProject.controller;
 
 import com.example.groupProject.annotation.WithMockCustomUser;
+import com.example.groupProject.config.filter.JWTFilter;
 import com.example.groupProject.controller.board.BoardController;
 import com.example.groupProject.domain.board.Board;
 import com.example.groupProject.domain.user.User;
@@ -14,15 +15,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,7 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(BoardController.class)
+@WebMvcTest(value = BoardController.class)
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.yml")
@@ -65,7 +72,7 @@ public class BoardControllerTest {
                 .content("게시글 내용")
                 .like(0)
                 .hit(0)
-                .register(LocalDate.now())
+                .createdAt(LocalDate.now())
                 .master(user)
                 .build());
 
@@ -148,7 +155,7 @@ public class BoardControllerTest {
 
     @Test
     @DisplayName("게시글을 정렬하여 확인할 수 있다")
-    @WithMockCustomUser
+    @WithMockUser
     public void 게시글_정렬_읽기() throws Exception {
         //given
         Long masterId = 1L;
@@ -168,7 +175,7 @@ public class BoardControllerTest {
                 .content("게시글 내용1")
                 .like(0)
                 .hit(0)
-                .register(LocalDate.now().minusDays(1))
+                .createdAt(LocalDate.now().minusDays(1))
                 .build();
 
         List<BoardDto> boardDtos = List.of(
