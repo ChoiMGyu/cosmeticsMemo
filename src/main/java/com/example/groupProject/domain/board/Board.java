@@ -25,9 +25,10 @@ public class Board {
     private String content; //게시물 내용
 
     @Builder.Default
+    @Column(name = "like_count")
     private Integer like = INITIAL_LIKE; //좋아요 수
 
-    private LocalDate register; //게시물 등록 일자
+    private LocalDate createdAt; //게시물 등록 일자
 
     @Builder.Default
     private Integer hit = INITIAL_HIT; //조회수

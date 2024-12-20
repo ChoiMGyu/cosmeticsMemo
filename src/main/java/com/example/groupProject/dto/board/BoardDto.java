@@ -23,7 +23,7 @@ public class BoardDto {
 
     private Integer like;
     private Integer hit;
-    private LocalDate register;
+    private LocalDate createdAt;
 
     public static BoardDto from(Board board) {
         return BoardDto.builder()
@@ -31,7 +31,7 @@ public class BoardDto {
                 .content(board.getContent())
                 .like(board.getLike())
                 .hit(board.getHit())
-                .register(board.getRegister())
+                .createdAt(board.getCreatedAt())
                 .build();
     }
 }
