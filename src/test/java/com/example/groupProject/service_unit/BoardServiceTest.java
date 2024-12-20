@@ -158,8 +158,7 @@ public class BoardServiceTest {
 
     @Test
     @DisplayName("게시글을 올바르게 수정한다")
-    public void 게시글_수정() throws Exception
-    {
+    public void 게시글_수정() throws Exception {
         //given
         Long findBoardId = 1L;
         BoardDto updateDto = BoardDto.builder()

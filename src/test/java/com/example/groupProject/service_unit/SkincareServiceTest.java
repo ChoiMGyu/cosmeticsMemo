@@ -126,8 +126,10 @@ public class SkincareServiceTest {
                     Comparator<Skincare> comparator = switch (sortBy) {
                         case "start_date" -> Comparator.comparing(Skincare::getStart_date);
                         case "end_date" -> Comparator.comparing(Skincare::getEnd_date);
-                        case "area" -> Comparator.comparing(Skincare::getArea, Comparator.nullsFirst(String::compareTo));
-                        case "moisture" -> Comparator.comparing(Skincare::getMoisture, Comparator.nullsFirst(String::compareTo));
+                        case "area" ->
+                                Comparator.comparing(Skincare::getArea, Comparator.nullsFirst(String::compareTo));
+                        case "moisture" ->
+                                Comparator.comparing(Skincare::getMoisture, Comparator.nullsFirst(String::compareTo));
                         default -> throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.");
                     };
 
@@ -161,8 +163,7 @@ public class SkincareServiceTest {
 
     @Test
     @DisplayName("스킨케어 메모를 휴지통(soft delete)으로 이동한다")
-    public void 메모_휴지통이동() throws Exception
-    {
+    public void 메모_휴지통이동() throws Exception {
         //given
         when(skincareRepository.findById(anyLong())).thenReturn(Optional.of(skincare));
         assertThat(skincare.getDeleted()).isEqualTo(false);
