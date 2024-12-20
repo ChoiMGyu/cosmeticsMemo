@@ -16,8 +16,8 @@ public class BoardSpecifications {
         return (root, query, criteriaBuilder) -> {
             if (sortBy != null) {
                 switch (sortBy) {
-                    case "register":
-                        query.orderBy(criteriaBuilder.desc(root.get("register")));
+                    case "createdAt":
+                        query.orderBy(criteriaBuilder.desc(root.get("createdAt")));
                         break;
                     case "hit":
                         query.orderBy(criteriaBuilder.desc(root.get("hit")));
