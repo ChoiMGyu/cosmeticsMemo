@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class BoardServiceImpl implements BoardService {
     private static final String NOT_EXIST_BOARD = "선택하신 게시물의 ID가 존재하지 않습니다.";
+    private static final String NOT_SAME_WRITER = "해당 게시물에 대한 권한이 없습니다.";
 
     private final BoardRepository boardRepository;
 
@@ -46,18 +47,27 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional
-    public void deleteByIdBoard(Long id) {
-        if (!boardRepository.existsById(id)) {
-            throw new IllegalArgumentException(NOT_EXIST_BOARD);
+    public void deleteByIdBoard(Long id, String writerAccount) {
+        Board findBoard = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
+
+        if(!findBoard.isSameWriter(writerAccount)) {
+            throw new IllegalArgumentException(NOT_SAME_WRITER);
         }
+
         boardRepository.deleteById(id);
     }
 
     @Override
     @Transactional
-    public void updateBoard(Long id, BoardDto boardDto) {
+    public void updateBoard(Long id, BoardDto boardDto, String writerAccount) {
         Board findBoard = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
+
+        if(!findBoard.isSameWriter(writerAccount)) {
+            throw new IllegalArgumentException(NOT_SAME_WRITER);
+        }
+
         findBoard.changeBoard(boardDto.getTitle(), boardDto.getContent());
     }
 

@@ -40,4 +40,11 @@ public class Board {
         this.title = title;
         this.content = content;
     }
+
+    public boolean isSameWriter(String writerAccount) {
+        if(!master.getAccount().equals(writerAccount)) {
+            return false;
+        }
+        return true;
+    }
 }

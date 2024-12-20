@@ -11,9 +11,9 @@ public interface BoardService {
 
     BoardDto findById(Long id);
 
-    void deleteByIdBoard(Long id);
+    void deleteByIdBoard(Long id, String writerAccount);
 
-    void updateBoard(Long id, BoardDto boardDto);
+    void updateBoard(Long id, BoardDto boardDto, String writerAccount);
 
     Page<BoardDto> findAllBoardPagingByMasterId(BoardPageDto boardPageDto);
 }
