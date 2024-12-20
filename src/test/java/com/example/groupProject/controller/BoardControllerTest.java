@@ -66,6 +66,7 @@ public class BoardControllerTest {
                 .like(0)
                 .hit(0)
                 .register(LocalDate.now())
+                .master(user)
                 .build());
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -73,6 +74,7 @@ public class BoardControllerTest {
 
     @Test
     @DisplayName("게시글을 올바르게 저장한다")
+    @WithMockCustomUser
     public void 게시글_저장() throws Exception {
         //given
         BoardDto boardDto = BoardDto.from(board);
@@ -81,11 +83,12 @@ public class BoardControllerTest {
         when(userService.findByAccount(anyString()))
                 .thenReturn(List.of(user));
 
-        //when
         String content = objectMapper.writeValueAsString(boardDto);
 
+        //when
+
         //then
-        mockMvc.perform(post("/api/boards")
+        mockMvc.perform(post("/api/boards/board")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
@@ -94,6 +97,7 @@ public class BoardControllerTest {
 
     @Test
     @DisplayName("게시글을 올바르게 업데이트한다")
+    @WithMockCustomUser
     public void 게시글_업데이트() throws Exception {
         //given
         Long boardId = 1L;
@@ -102,21 +106,22 @@ public class BoardControllerTest {
                 .content("수정할 게시글 내용")
                 .build();
 
-        doNothing().when(boardService).updateBoard(boardId, any(BoardDto.class));
+        doNothing().when(boardService).updateBoard(eq(boardId), any(BoardDto.class), anyString());
 
         String content = objectMapper.writeValueAsString(updateBoardDto);
 
         //when
 
         //then
-        mockMvc.perform(put("/api/boards")
+        mockMvc.perform(put("/api/boards/board")
                         .param("id", String.valueOf(boardId))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(content))
+                        .content(content)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        verify(boardService).updateBoard(eq(boardId), any(BoardDto.class));
+        verify(boardService).updateBoard(eq(boardId), any(BoardDto.class), anyString());
     }
 
     @Test
@@ -126,22 +131,24 @@ public class BoardControllerTest {
         //given
         Long boardId = 1L;
 
-        doNothing().when(boardService).deleteByIdBoard(eq(boardId));
+        doNothing().when(boardService).deleteByIdBoard(eq(boardId), anyString());
 
         //when
 
         //then
-        mockMvc.perform(delete("/api/boards")
+        mockMvc.perform(delete("/api/boards/board")
                         .param("id", String.valueOf(boardId))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        verify(boardService).deleteByIdBoard(eq(boardId));
+        verify(boardService).deleteByIdBoard(eq(boardId), anyString());
     }
 
     @Test
     @DisplayName("게시글을 정렬하여 확인할 수 있다")
+    @WithMockCustomUser
     public void 게시글_정렬_읽기() throws Exception {
         //given
         Long masterId = 1L;
@@ -172,15 +179,14 @@ public class BoardControllerTest {
 
         when(boardService.findAllBoardPagingByMasterId(any(BoardPageDto.class))).thenReturn(boardDtoPage);
 
+        String content = objectMapper.writeValueAsString(boardPageDto);
+
         //when
 
         //then
-        mockMvc.perform(get("/api/boards")
-                        .param("masterId", String.valueOf(masterId))
-                        .param("page", String.valueOf(page))
-                        .param("size", String.valueOf(size))
-                        .param("sortBy", sortBy)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/boards/board")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
                 .andExpect(status().isOk())
                 .andDo(print());
 
