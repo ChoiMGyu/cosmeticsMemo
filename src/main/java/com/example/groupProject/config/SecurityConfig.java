@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -51,6 +52,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(publicUrls()).permitAll()
+                        .requestMatchers(HttpMethod.GET, getPublicGetUrls()).permitAll()
                         .anyRequest().authenticated()
                 );
 
@@ -71,10 +73,16 @@ public class SecurityConfig {
     }
 
     private static String[] publicUrls() {
-        return new String[] {
+        return new String[]{
                 "/login", "/", "/join", "/api/user/new",
                 "/alarm", "/send", "/reissue",
                 "/test/not", "/test/user"
+        };
+    }
+
+    private static String[] getPublicGetUrls() {
+        return new String[]{
+                "/api/boards/board/**"
         };
     }
 
