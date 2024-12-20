@@ -1,14 +1,13 @@
 package com.example.groupProject.controller;
 
 import com.example.groupProject.annotation.WithMockCustomUser;
+import com.example.groupProject.controller.board.BoardController;
 import com.example.groupProject.domain.board.Board;
-import com.example.groupProject.domain.memo.Skincare;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.board.BoardDto;
 import com.example.groupProject.dto.board.BoardPageDto;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.board.BoardService;
-import com.example.groupProject.service.board.BoardServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +32,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BoardController.class)
@@ -75,8 +73,7 @@ public class BoardControllerTest {
 
     @Test
     @DisplayName("게시글을 올바르게 저장한다")
-    public void 게시글_저장() throws Exception
-    {
+    public void 게시글_저장() throws Exception {
         //given
         BoardDto boardDto = BoardDto.from(board);
         when(boardService.saveBoard(any(BoardDto.class), any(User.class)))
@@ -97,8 +94,7 @@ public class BoardControllerTest {
 
     @Test
     @DisplayName("게시글을 올바르게 업데이트한다")
-    public void 게시글_업데이트() throws Exception
-    {
+    public void 게시글_업데이트() throws Exception {
         //given
         Long boardId = 1L;
         BoardDto updateBoardDto = BoardDto.builder()
@@ -114,9 +110,9 @@ public class BoardControllerTest {
 
         //then
         mockMvc.perform(put("/api/boards")
-                .param("id", String.valueOf(boardId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content))
+                        .param("id", String.valueOf(boardId))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -126,8 +122,7 @@ public class BoardControllerTest {
     @Test
     @DisplayName("게시글을 올바르게 삭제한다")
     @WithMockCustomUser
-    public void 게시글_삭제() throws Exception
-    {
+    public void 게시글_삭제() throws Exception {
         //given
         Long boardId = 1L;
 
@@ -137,8 +132,8 @@ public class BoardControllerTest {
 
         //then
         mockMvc.perform(delete("/api/boards")
-                .param("id", String.valueOf(boardId))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .param("id", String.valueOf(boardId))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -147,8 +142,7 @@ public class BoardControllerTest {
 
     @Test
     @DisplayName("게시글을 정렬하여 확인할 수 있다")
-    public void 게시글_정렬_읽기() throws Exception
-    {
+    public void 게시글_정렬_읽기() throws Exception {
         //given
         Long masterId = 1L;
         int page = 0;
@@ -182,13 +176,13 @@ public class BoardControllerTest {
 
         //then
         mockMvc.perform(get("/api/boards")
-                .param("masterId", String.valueOf(masterId))
-                .param("page", String.valueOf(page))
-                .param("size", String.valueOf(size))
-                .param("sortBy", sortBy)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andDo(print());
+                        .param("masterId", String.valueOf(masterId))
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .param("sortBy", sortBy)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
 
         verify(boardService).findAllBoardPagingByMasterId(any(BoardPageDto.class));
     }

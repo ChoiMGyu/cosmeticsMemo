@@ -59,6 +59,7 @@ public class BoardServiceTest {
                 .like(0)
                 .hit(0)
                 .register(LocalDate.now())
+                .master(user)
                 .build());
     }
 
@@ -80,15 +81,17 @@ public class BoardServiceTest {
     public void 게시글_삭제() throws Exception {
         //given
         Long boardId = 1L;
+        String writerAccount = "account";
 
-        when(boardRepository.existsById(boardId)).thenReturn(true);
+        when(boardRepository.findById(boardId)).thenReturn(Optional.of(board));
+        when(board.isSameWriter(anyString())).thenReturn(true);
         doNothing().when(boardRepository).deleteById(boardId);
 
         //when
-        boardService.deleteByIdBoard(boardId);
+        boardService.deleteByIdBoard(boardId, writerAccount);
 
         //then
-        verify(boardRepository).existsById(boardId);
+        verify(boardRepository).findById(boardId);
         verify(boardRepository).deleteById(boardId);
     }
 
@@ -161,15 +164,17 @@ public class BoardServiceTest {
     public void 게시글_수정() throws Exception {
         //given
         Long findBoardId = 1L;
+        String writerAccount = "account";
         BoardDto updateDto = BoardDto.builder()
                 .title("수정된 제목")
                 .content("수정된 내용")
                 .build();
 
         when(boardRepository.findById(findBoardId)).thenReturn(Optional.of(board));
+        when(board.isSameWriter(anyString())).thenReturn(true);
 
         //when
-        boardService.updateBoard(findBoardId, updateDto);
+        boardService.updateBoard(findBoardId, updateDto, writerAccount);
 
         //then
         verify(boardRepository, times(1)).findById(findBoardId);
