@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BoardPageDto {
 
-    private Long masterId;
-
     private int page;
 
     private int size;

@@ -36,7 +36,7 @@ public class BoardController {
 
     @GetMapping("/board")
     public ResponseEntity<BoardAllDto> findAllBoards(@RequestBody BoardPageDto boardPageDto) {
-        Page<BoardDto> boardPage = boardService.findAllBoardPagingByMasterId(boardPageDto);
+        Page<BoardDto> boardPage = boardService.findAllBoardPaging(boardPageDto);
         return ResponseEntity.status(HttpStatus.OK).body(BoardAllDto.from(boardPage.getContent()));
     }
 

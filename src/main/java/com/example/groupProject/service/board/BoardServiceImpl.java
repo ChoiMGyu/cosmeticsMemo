@@ -72,11 +72,10 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Page<BoardDto> findAllBoardPagingByMasterId(BoardPageDto boardPageDto) {
+    public Page<BoardDto> findAllBoardPaging(BoardPageDto boardPageDto) {
         Pageable pageable = PageRequest.of(boardPageDto.getPage(), boardPageDto.getSize());
 
-        Specification<Board> spec = Specification.where(BoardSpecifications.withMasterId(boardPageDto.getMasterId()))
-                .and(BoardSpecifications.sortBy(boardPageDto.getSortBy()));
+        Specification<Board> spec = Specification.where(BoardSpecifications.sortBy(boardPageDto.getSortBy()));
 
         Page<Board> skincareMemoPaging = boardRepository.findAll(spec, pageable);
 

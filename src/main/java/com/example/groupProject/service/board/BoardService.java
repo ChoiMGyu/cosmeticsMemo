@@ -15,5 +15,5 @@ public interface BoardService {
 
     void updateBoard(Long id, BoardDto boardDto, String writerAccount);
 
-    Page<BoardDto> findAllBoardPagingByMasterId(BoardPageDto boardPageDto);
+    Page<BoardDto> findAllBoardPaging(BoardPageDto boardPageDto);
 }
