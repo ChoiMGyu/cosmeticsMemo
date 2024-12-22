@@ -1,7 +1,6 @@
 package com.example.groupProject.controller;
 
 import com.example.groupProject.annotation.WithMockCustomUser;
-import com.example.groupProject.config.filter.JWTFilter;
 import com.example.groupProject.controller.board.BoardController;
 import com.example.groupProject.domain.board.Board;
 import com.example.groupProject.domain.user.User;
@@ -15,23 +14,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -72,7 +65,6 @@ public class BoardControllerTest {
                 .content("게시글 내용")
                 .like(0)
                 .hit(0)
-                .createdAt(LocalDate.now())
                 .master(user)
                 .build());
 
@@ -158,13 +150,11 @@ public class BoardControllerTest {
     @WithMockUser
     public void 게시글_정렬_읽기() throws Exception {
         //given
-        Long masterId = 1L;
         int page = 0;
         int size = 10;
         String sortBy = "register";
 
         BoardPageDto boardPageDto = BoardPageDto.builder()
-                .masterId(masterId)
                 .page(page)
                 .size(size)
                 .sortBy(sortBy)
@@ -175,7 +165,6 @@ public class BoardControllerTest {
                 .content("게시글 내용1")
                 .like(0)
                 .hit(0)
-                .createdAt(LocalDate.now().minusDays(1))
                 .build();
 
         List<BoardDto> boardDtos = List.of(
@@ -184,7 +173,7 @@ public class BoardControllerTest {
 
         PageImpl<BoardDto> boardDtoPage = new PageImpl<>(boardDtos, PageRequest.of(page, size), boardDtos.size());
 
-        when(boardService.findAllBoardPagingByMasterId(any(BoardPageDto.class))).thenReturn(boardDtoPage);
+        when(boardService.findAllBoardPaging(any(BoardPageDto.class))).thenReturn(boardDtoPage);
 
         String content = objectMapper.writeValueAsString(boardPageDto);
 
@@ -197,7 +186,7 @@ public class BoardControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        verify(boardService).findAllBoardPagingByMasterId(any(BoardPageDto.class));
+        verify(boardService).findAllBoardPaging(any(BoardPageDto.class));
     }
 
 

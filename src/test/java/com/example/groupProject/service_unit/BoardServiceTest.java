@@ -25,7 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +58,6 @@ public class BoardServiceTest {
                 .content("게시글 내용")
                 .like(0)
                 .hit(0)
-                .createdAt(LocalDate.now())
                 .master(user)
                 .build());
     }
@@ -98,27 +97,35 @@ public class BoardServiceTest {
     @ParameterizedTest
     @DisplayName("게시글을 정렬 기준에 다라 페이징하여 반환한다")
     @CsvSource({
-            "register, 게시글 제목, 나",
+            "createdAt, 게시글 제목, 가",
             "hit, 가, 나",
             "like, 가, 나"
     })
     public void 정렬기준_게시글_페이징(String sortBy, String expectedFirst, String expectedSecond) throws Exception {
         //given
-        Board board1 = Board.builder()
+        LocalDateTime timeForBoard1 = LocalDateTime.of(2024, 12, 22, 0, 0);
+        LocalDateTime timeForBoard2 = LocalDateTime.of(2024, 12, 21, 0, 0);
+        LocalDateTime testTime = LocalDateTime.of(2024, 12, 24, 0, 0);
+
+        Board board1 = spy(Board.builder()
                 .title("가")
                 .content("안녕하세요.처음 뵙겠습니다.")
                 .like(2)
                 .hit(2)
-                .createdAt(LocalDate.now().minusMonths(1))
-                .build();
+                .build());
 
-        Board board2 = Board.builder()
+        Board board2 = spy(Board.builder()
                 .title("나")
                 .content("Hi")
                 .like(1)
                 .hit(1)
-                .createdAt(LocalDate.now().minusDays(1))
-                .build();
+                .build());
+
+        if (sortBy.equals("createdAt")) {
+            when(board.getCreatedAt()).thenReturn(testTime);
+            when(board1.getCreatedAt()).thenReturn(timeForBoard1);
+            when(board2.getCreatedAt()).thenReturn(timeForBoard2);
+        }
 
         List<Board> boards = List.of(board, board1, board2);
         Pageable pageable = PageRequest.of(0, 2);
@@ -144,13 +151,12 @@ public class BoardServiceTest {
 
         //when
         BoardPageDto boardPageDto = BoardPageDto.builder()
-                .masterId(1L)
                 .page(0)
                 .size(2)
                 .sortBy(sortBy)
                 .build();
 
-        Page<BoardDto> resultPage = boardService.findAllBoardPagingByMasterId(boardPageDto);
+        Page<BoardDto> resultPage = boardService.findAllBoardPaging(boardPageDto);
 
         //then
         Assertions.assertNotNull(resultPage);
