@@ -27,6 +27,7 @@ public class BoardController {
     private static final int BOARD_WRITER = 0;
     private static final String SUCCESS_CREATE_BOARD_MESSAGE = "게시물을 성공적으로 게시하였습니다.";
     private static final String SUCCESS_DELETE_BOARD_MESSAGE = "게시물을 성공적으로 삭제하였습니다.";
+    private static final String SUCCESS_UPDATE_BOARD_MESSAGE = "게시물을 성공적으로 수정하였습니다.";
 
     private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 
@@ -68,7 +69,7 @@ public class BoardController {
     @PutMapping("/board")
     public ResponseEntity<String> updateBoard(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                               @RequestParam(value = "id") Long id,
-                                              @RequestBody BoardDto boardDto) {
+                                              @Valid @RequestBody BoardDto boardDto) {
 
         if (customUserDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage());
@@ -76,6 +77,6 @@ public class BoardController {
 
         boardService.updateBoard(id, boardDto, customUserDetails.getUsername());
 
-        return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_DELETE_BOARD_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_UPDATE_BOARD_MESSAGE);
     }
 }
