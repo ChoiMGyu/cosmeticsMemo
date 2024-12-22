@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Board {
+public class Board extends Timestamped {
     private static final int INITIAL_LIKE = 0;
     private static final int INITIAL_HIT = 0;
 
@@ -28,8 +28,6 @@ public class Board {
     @Column(name = "like_count")
     private Integer like = INITIAL_LIKE; //좋아요 수
 
-    private LocalDate createdAt; //게시물 등록 일자
-
     @Builder.Default
     private Integer hit = INITIAL_HIT; //조회수
 
@@ -43,7 +41,7 @@ public class Board {
     }
 
     public boolean isSameWriter(String writerAccount) {
-        if(!master.getAccount().equals(writerAccount)) {
+        if (!master.getAccount().equals(writerAccount)) {
             return false;
         }
         return true;
