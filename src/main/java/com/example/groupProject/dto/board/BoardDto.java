@@ -22,7 +22,6 @@ public class BoardDto {
     @NotBlank(message = "내용은 한 글자 이상 입력 해야 합니다.")
     private String content;
 
-    private Integer like;
     private Integer hit;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
@@ -31,7 +30,6 @@ public class BoardDto {
         return BoardDto.builder()
                 .title(board.getTitle())
                 .content(board.getContent())
-                .like(board.getLike())
                 .hit(board.getHit())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
