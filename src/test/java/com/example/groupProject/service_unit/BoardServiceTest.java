@@ -56,7 +56,6 @@ public class BoardServiceTest {
         board = spy(Board.builder()
                 .title("게시글 제목")
                 .content("게시글 내용")
-                .like(0)
                 .hit(0)
                 .master(user)
                 .build());
@@ -98,8 +97,7 @@ public class BoardServiceTest {
     @DisplayName("게시글을 정렬 기준에 다라 페이징하여 반환한다")
     @CsvSource({
             "createdAt, 게시글 제목, 가",
-            "hit, 가, 나",
-            "like, 가, 나"
+            "hit, 가, 나"
     })
     public void 정렬기준_게시글_페이징(String sortBy, String expectedFirst, String expectedSecond) throws Exception {
         //given
@@ -110,14 +108,12 @@ public class BoardServiceTest {
         Board board1 = spy(Board.builder()
                 .title("가")
                 .content("안녕하세요.처음 뵙겠습니다.")
-                .like(2)
                 .hit(2)
                 .build());
 
         Board board2 = spy(Board.builder()
                 .title("나")
                 .content("Hi")
-                .like(1)
                 .hit(1)
                 .build());
 
@@ -136,7 +132,7 @@ public class BoardServiceTest {
                     Comparator<Board> comparator = switch (sortBy) {
                         case "createdAt" -> Comparator.comparing(Board::getCreatedAt).reversed();
                         case "hit" -> Comparator.comparing(Board::getHit).reversed();
-                        case "like" -> Comparator.comparing(Board::getLike).reversed();
+                        //case "like" -> Comparator.comparing(Board::getLike).reversed();
                         default -> throw new IllegalArgumentException("지원하지 않는 정렬 기준입니다.");
                     };
 

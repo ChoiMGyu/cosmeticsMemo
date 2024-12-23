@@ -63,7 +63,6 @@ public class BoardControllerTest {
         board = spy(Board.builder()
                 .title("게시글 제목")
                 .content("게시글 내용")
-                .like(0)
                 .hit(0)
                 .master(user)
                 .build());
@@ -163,7 +162,6 @@ public class BoardControllerTest {
         Board board1 = Board.builder()
                 .title("게시글 제목1")
                 .content("게시글 내용1")
-                .like(0)
                 .hit(0)
                 .build();
 
