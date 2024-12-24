@@ -11,6 +11,8 @@ import lombok.*;
 @Builder
 public class Board extends Timestamped {
     private static final int INITIAL_HIT = 0;
+    private static final int INITIAL_LIKE = 0;
+    private static final String INVALID_LIKE_MESSAGE = "좋아요 개수는 0개 이하일 수 없습니다.";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +25,10 @@ public class Board extends Timestamped {
 
     @Builder.Default
     private Integer hit = INITIAL_HIT; //조회수
+
+    @Builder.Default
+    @Column(name = "like_count")
+    private Integer like = INITIAL_LIKE; //좋아요 수
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_id")
@@ -38,5 +44,16 @@ public class Board extends Timestamped {
             return false;
         }
         return true;
+    }
+
+    public void increment() {
+        this.like++;
+    }
+
+    public void decrement() {
+        if(this.like <= INITIAL_LIKE) {
+            throw new IllegalStateException(INVALID_LIKE_MESSAGE);
+        }
+        this.like--;
     }
 }

@@ -90,7 +90,7 @@ public class LikesServiceTest {
                 .build();
 
         //when
-        likesService.decrementLike(board.getId(), user);
+        likesService.decrementLike(likes.getId())
 
         //then
         assertThat(likes.getLike()).isEqualTo(0);
@@ -120,10 +120,19 @@ public class LikesServiceTest {
     @DisplayName("좋아요를 누른 사람을 찾을 수 있다")
     public void 좋아요_주인() throws Exception {
         //given
+        Likes likes = Likes.builder()
+                .user(user)
+                .board(board)
+                .like(0)
+                .build();
+
+        when(likesRepository.findById(any(Long.class))).thenReturn(Optional.of(likes));
 
         //when
+        Likes findLike = likesRepository.findById(1L).orElseThrow();
 
         //then
+        assertThat(findLike.getUser()).isEqualTo(user);
     }
 
     @Test
