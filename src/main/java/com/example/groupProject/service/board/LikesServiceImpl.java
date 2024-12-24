@@ -1,6 +1,8 @@
 package com.example.groupProject.service.board;
 
 import com.example.groupProject.domain.board.Board;
+import com.example.groupProject.domain.board.Likes;
+import com.example.groupProject.domain.user.User;
 import com.example.groupProject.repository.board.BoardRepository;
 import com.example.groupProject.repository.board.LikesRepository;
 import com.example.groupProject.repository.user.UserRepositoryImpl;
@@ -24,26 +26,43 @@ public class LikesServiceImpl implements LikesService {
     @Override
     @Transactional
     public void incrementLike(Long boardId, String account) {
-        userRepository.findByAccount(account).stream()
+        User findUser = userRepository.findByAccount(account).stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_USER));
 
         Board findBoard = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
 
-        findBoard.increment();
+        likesRepository.findByUserAndBoard(findUser, findBoard)
+                .map(existingLike -> {
+                    findBoard.increment();
+                    return existingLike;
+                })
+                .orElseGet(() -> {
+                    Likes like = Likes.builder()
+                            .user(findUser)
+                            .board(findBoard)
+                            .build();
+                    likesRepository.save(like);
+                    findBoard.increment();
+                    return like;
+                });
     }
 
     @Override
     @Transactional
     public void decrementLike(Long boardId, String account) {
-        userRepository.findByAccount(account).stream()
+        User findUser = userRepository.findByAccount(account).stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_USER));
 
         Board findBoard = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
 
-        findBoard.decrement();
+        likesRepository.findByUserAndBoard(findUser, findBoard)
+                .ifPresent(like -> {
+                    likesRepository.delete(like);
+                    findBoard.decrement();
+                });
     }
 }
