@@ -34,10 +34,6 @@ public class LikesServiceImpl implements LikesService {
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
 
         likesRepository.findByUserAndBoard(findUser, findBoard)
-                .map(existingLike -> {
-                    findBoard.increment();
-                    return existingLike;
-                })
                 .orElseGet(() -> {
                     Likes like = Likes.builder()
                             .user(findUser)

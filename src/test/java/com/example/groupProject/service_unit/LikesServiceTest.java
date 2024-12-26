@@ -108,20 +108,39 @@ public class LikesServiceTest {
         assertThat(board.getLike()).isEqualTo(expectedLikes);
     }
 
+    private static Stream<Arguments> provideDecrementLikeTestCase() {
+        return Stream.of(
+                Arguments.of("사용자가 좋아요를 누른 경우에만 숫자가 감소한다", true, 0),
+                Arguments.of("사용자가 좋아요를 누르지 않았을 경우에는 숫자가 감소하지 않는다", false, 1)
+        );
+    }
 
-    @Test
-    @DisplayName("사용자가 좋아요를 누른 경우에만 다시 눌렀을 때 숫자가 감소한다")
-    public void 좋아요수_감소() throws Exception {
-        //given
-        when(userRepository.findByAccount(any(String.class))).thenReturn(List.of(user));
+    @ParameterizedTest(name = "{index} - {0}")
+    @MethodSource("provideDecrementLikeTestCase")
+    @DisplayName("게시글 좋아요 감소 테스트")
+    public void 게시글_좋아요_감소(String description, boolean isAlreadyLiked, int expectedLikes) throws Exception {
+        // given
+        Likes existingLike = Likes.builder()
+                .user(user)
+                .board(board)
+                .build();
+
+        when(userRepository.findByAccount(user.getAccount())).thenReturn(List.of(user));
         when(boardRepository.findById(1L)).thenReturn(Optional.of(board));
 
-        //when
-        likesService.decrementLike(1L, anyString());
+        if (isAlreadyLiked) {
+            when(likesRepository.findByUserAndBoard(user, board)).thenReturn(Optional.of(existingLike));
+        } else {
+            when(likesRepository.findByUserAndBoard(user, board)).thenReturn(Optional.empty());
+        }
 
-        //then
-        assertThat(board.getLike()).isEqualTo(0);
+        // when
+        likesService.decrementLike(1L, user.getAccount());
+
+        // then
+        assertThat(board.getLike()).isEqualTo(expectedLikes);
     }
+
 
     @Test
     @DisplayName("좋아요를 누른 사용자가 저장된다")
