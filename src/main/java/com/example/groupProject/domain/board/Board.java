@@ -51,9 +51,18 @@ public class Board extends Timestamped {
     }
 
     public void decrement() {
-        if(this.like <= INITIAL_LIKE) {
+        if (this.like <= INITIAL_LIKE) {
             throw new IllegalStateException(INVALID_LIKE_MESSAGE);
         }
         this.like--;
+    }
+
+    public void changeLikeCount(int likeCount) {
+        this.like = likeCount;
+    }
+
+    public boolean likeCountUpdateCompare(int likeCount) {
+        if (this.like != likeCount) return true;
+        else return false;
     }
 }

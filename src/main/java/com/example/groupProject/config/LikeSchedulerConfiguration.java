@@ -1,7 +1,7 @@
 package com.example.groupProject.config;
 
-import com.example.groupProject.service.memo.FcmJob;
-import com.example.groupProject.service.memo.FcmJobListener;
+import com.example.groupProject.service.board.LikeJob;
+import com.example.groupProject.service.board.LikeJobListener;
 import jakarta.annotation.PostConstruct;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -11,47 +11,45 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@ConditionalOnProperty(name = "scheduler.enabled", havingValue = "true", matchIfMissing = false)
-public class SchedulerConfiguration implements WebMvcConfigurer {
-
-    private static String APPLICATION_NAME = "appContext";
+@ConditionalOnProperty(name = "likeScheduler.enabled", havingValue = "true", matchIfMissing = false)
+public class LikeSchedulerConfiguration implements WebMvcConfigurer {
+    private static final int JOB_INTERVAL_MINUTE = 1;
+    private static final String APPLICATION_NAME = "appContext";
 
     private Scheduler scheduler;
     private final ApplicationContext applicationContext;
 
-    public SchedulerConfiguration(Scheduler sch, ApplicationContext applicationContext) {
-        this.scheduler = sch;
+    public LikeSchedulerConfiguration(Scheduler scheduler, ApplicationContext applicationContext) {
+        this.scheduler = scheduler;
         this.applicationContext = applicationContext;
     }
 
     @PostConstruct
-    private void configScheduler() throws SchedulerException {
-
+    public void scheduleLikeWriteJob() throws SchedulerException {
         JobDataMap ctx = new JobDataMap();
         ctx.put(APPLICATION_NAME, applicationContext);
 
-        JobDetail job = JobBuilder
-                .newJob(FcmJob.class)
-                .withIdentity("fcmSendJob", "fcmGroup")
-                .withDescription("FCM 처리를 위한 조회 Job")
+        JobDetail job = JobBuilder.newJob(LikeJob.class)
+                .withIdentity("likeWriteJob", "likeGroup")
+                .withDescription("LIKE의 수를 DB에 저장 Job")
                 .setJobData(ctx)
                 .build();
 
         Trigger trigger = TriggerBuilder
                 .newTrigger()
-                .withIdentity("fcmSendTrigger", "fcmGroup")
-                .withDescription("FCM 처리를 위한 조회 Trigger")
+                .withIdentity("likeWriteTrigger", "likeGroup")
+                .withDescription("LIKE의 수를 DB에 저장 Trigger")
                 .startNow()
                 .withSchedule(
                         SimpleScheduleBuilder
                                 .simpleSchedule()
-                                .withIntervalInSeconds(100000000)
+                                .withIntervalInMinutes(JOB_INTERVAL_MINUTE)
                                 .repeatForever())
                 .build();
 
         scheduler = new StdSchedulerFactory().getScheduler();
-        FcmJobListener fcmJobListener = new FcmJobListener();
-        scheduler.getListenerManager().addJobListener(fcmJobListener);
+        LikeJobListener likeJobListener = new LikeJobListener();
+        scheduler.getListenerManager().addJobListener(likeJobListener);
         scheduler.start();
         scheduler.scheduleJob(job, trigger);
     }

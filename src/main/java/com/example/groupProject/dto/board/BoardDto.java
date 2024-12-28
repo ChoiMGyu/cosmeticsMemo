@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -23,6 +22,7 @@ public class BoardDto {
     private String content;
 
     private Integer hit;
+    private Integer like;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
@@ -31,6 +31,7 @@ public class BoardDto {
                 .title(board.getTitle())
                 .content(board.getContent())
                 .hit(board.getHit())
+                .like(board.getLike())
                 .createdAt(board.getCreatedAt())
                 .modifiedAt(board.getModifiedAt())
                 .build();

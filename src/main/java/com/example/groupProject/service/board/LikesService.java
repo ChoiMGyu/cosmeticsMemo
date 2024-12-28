@@ -5,4 +5,6 @@ public interface LikesService {
     void incrementLike(Long boardId, String account);
 
     void decrementLike(Long boardId, String account);
+
+    void syncLikesToDatabase();
 }
