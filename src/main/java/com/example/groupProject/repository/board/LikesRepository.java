@@ -18,6 +18,6 @@ public interface LikesRepository extends JpaRepository<Likes, Long> {
     @Query("SELECT l FROM Likes l JOIN FETCH l.user u WHERE u.account = :account")
     Optional<Likes> findByAccountJoinFetch(@Param(value = "account") String account);
 
-    @Query("SELECT l FROM Likes l join fetch Board b WHERE l.board.id = :boardId")
+    @Query("SELECT l FROM Likes l join fetch l.board b WHERE b.id = :boardId")
     Set<Likes> findByBoardIdJoinFetch(@Param(value = "boardId") Long boardId);
 }
