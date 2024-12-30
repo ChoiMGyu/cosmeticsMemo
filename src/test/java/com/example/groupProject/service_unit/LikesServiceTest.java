@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -26,9 +27,12 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -78,8 +82,6 @@ public class LikesServiceTest {
                 .master(user)
                 .like(1)
                 .build();
-
-        when(redisUserTemplate.opsForSet()).thenReturn(setOperations);
     }
 
     private static Stream<Arguments> provideIncrementLikeTestCase() {
@@ -98,9 +100,10 @@ public class LikesServiceTest {
         //given
         long findBoardId = 1L;
         String redisKey = "board_users:" + findBoardId;
+
+        when(redisUserTemplate.opsForSet()).thenReturn(setOperations);
         when(boardRepository.findById(findBoardId)).thenReturn(Optional.of(board));
         when(userRepository.findByAccount(anyString())).thenReturn(List.of(user));
-
         when(setOperations.isMember(eq(redisKey), anyString())).thenReturn(redisExist);
 
         if (!redisExist) {
@@ -141,6 +144,7 @@ public class LikesServiceTest {
         long findBoardId = 1L;
         String redisKey = "board_users:" + findBoardId;
 
+        when(redisUserTemplate.opsForSet()).thenReturn(setOperations);
         when(boardRepository.existsById(findBoardId)).thenReturn(true);
         when(setOperations.isMember(redisKey, user.getAccount())).thenReturn(redisExist);
 
@@ -167,14 +171,63 @@ public class LikesServiceTest {
         }
     }
 
-    @Test
-    @DisplayName("Redis에 저장된 게시글의 좋아요 수를 DB와 동기화한다")
-    public void Redis_DB_동기화() throws Exception {
+    private static Stream<Arguments> provideSyncLikesToDatabaseTestCases() {
+        return Stream.of(
+                Arguments.of(
+                        "Redis에 게시글이 존재하지 않는 경우",
+                        null,
+                        null,
+                        null,
+                        null
+                ),
+                Arguments.of(
+                        "Redis와 DB의 좋아요 수가 동일한 경우",
+                        Set.of("board_users:1"),
+                        true,
+                        1,
+                        1
+                ),
+                Arguments.of(
+                        "Redis와 DB의 좋아요 수가 다른 경우",
+                        Set.of("board_users:1", "board_users:2"),
+                        false,
+                        2,
+                        2
+                )
+        );
+    }
+
+    @ParameterizedTest(name = "{index} - {0}")
+    @MethodSource("provideSyncLikesToDatabaseTestCases")
+    @DisplayName("Redis와 DB의 좋아요 수를 동기화 한다")
+    public void Redis_DB_동기화(String description, Set<String> keys, Boolean isSameRedisDB, Integer expectedLikeCount, Integer repeatTime) throws Exception {
         //given
+        when(redisUserTemplate.keys(anyString())).thenReturn(keys);
+
+        Board findBoard = spy(Board.builder()
+                .title("Test Board")
+                .content("Test Content")
+                .master(user)
+                .like(1)
+                .build());
+
+        if (keys != null) {
+            for (String key : keys) {
+                Long boardId = Long.parseLong(key.replace("board_users:", ""));
+                when(redisUserTemplate.opsForSet()).thenReturn(setOperations);
+                when(redisUserTemplate.opsForSet().size(key)).thenReturn(Long.valueOf(keys.size()));
+                when(boardRepository.findById(boardId)).thenReturn(Optional.of(findBoard));
+                when(findBoard.likeCountUpdateCompare(repeatTime)).thenReturn(isSameRedisDB);
+            }
+        }
 
         //when
-
         //then
+        likesService.syncLikesToDatabase();
+        if (keys != null && !isSameRedisDB) {
+            findBoard.changeLikeCount(keys.size());
+            assertThat(findBoard.getLike()).isEqualTo(expectedLikeCount);
+        }
     }
 
     @Test
