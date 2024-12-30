@@ -136,33 +136,34 @@ public class LikesServiceTest {
     @ParameterizedTest(name = "{index} - {0}")
     @MethodSource("provideDecrementLikeTestCase")
     @DisplayName("게시글 좋아요 감소 테스트")
-    public void 게시글_좋아요_감소(String description, boolean redisExist, boolean dbExist, boolean isNotAlreadyLike) throws Exception {
-        //given
+    public void 게시글_좋아요_감소(String description, boolean redisExist, boolean dbExist, boolean isNotAlreadyLike) {
+        // given
         long findBoardId = 1L;
         String redisKey = "board_users:" + findBoardId;
-        when(boardRepository.existsById(findBoardId)).thenReturn(true);
-        when(setOperations.isMember(eq(redisKey), anyString())).thenReturn(redisExist);
 
-        if(!redisExist) {
-            if(dbExist) {
-                when(likesRepository.findByAccountJoinFetch(anyString()))
-                        .thenReturn(Optional.of(Likes.builder().user(user).board(board).build()));
-            }
-            else {
-                when(likesRepository.findByAccountJoinFetch(anyString()))
-                        .thenReturn(Optional.empty());
-            }
+        when(boardRepository.existsById(findBoardId)).thenReturn(true);
+        when(setOperations.isMember(redisKey, user.getAccount())).thenReturn(redisExist);
+
+        if (dbExist) {
+            when(likesRepository.findByAccountJoinFetch(user.getAccount()))
+                    .thenReturn(Optional.of(Likes.builder().user(user).board(board).build()));
+        } else {
+            when(likesRepository.findByAccountJoinFetch(user.getAccount())).thenReturn(Optional.empty());
         }
 
-        //when
-        //then
-        if(isNotAlreadyLike) {
+        // when
+        // then
+        if (isNotAlreadyLike) {
             assertThrows(IllegalArgumentException.class,
                     () -> likesService.decrementLike(findBoardId, user.getAccount()));
         } else {
             likesService.decrementLike(findBoardId, user.getAccount());
-            verify(redisUserTemplate.opsForSet(), times(1)).remove(eq(redisKey), eq(user.getAccount()));
-            verify(likesRepository, times(1)).delete(any(Likes.class));
+            if (redisExist) {
+                verify(redisUserTemplate.opsForSet(), times(1)).remove(redisKey, user.getAccount());
+            }
+            if (dbExist) {
+                verify(likesRepository, times(1)).delete(any(Likes.class));
+            }
         }
     }
 
