@@ -48,7 +48,7 @@ public class LikesServiceImpl implements LikesService {
         String redisKey = REDIS_LIKE_USER_KEY + boardId;
 
         Boolean alreadyLiked = redisUserTemplate.opsForSet().isMember(redisKey, account);
-        if(Boolean.TRUE.equals(alreadyLiked)) {
+        if (Boolean.TRUE.equals(alreadyLiked)) {
             log.info("Redis에 저장된 사용자 - 좋아요 증가");
             throw new IllegalArgumentException(ALREADY_LIKE);
         }
@@ -79,19 +79,17 @@ public class LikesServiceImpl implements LikesService {
         String redisKey = REDIS_LIKE_USER_KEY + boardId;
 
         Boolean alreadyLiked = redisUserTemplate.opsForSet().isMember(redisKey, account);
-        if(Boolean.FALSE.equals(alreadyLiked)) {
-            Likes findLikes = likesRepository.findByAccountJoinFetch(account)
-                    .stream().findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException(NOT_ALREADY_LIKE));
-
-            likesRepository.delete(findLikes);
-        }
-        else {
+        if (Boolean.TRUE.equals(alreadyLiked)) {
             redisUserTemplate.opsForSet().remove(redisKey, account);
-            if(likesRepository.findByAccountJoinFetch(account).isPresent()){
-                Likes findLikes = likesRepository.findByAccountJoinFetch(account).get();
-                likesRepository.delete(findLikes);
-            }
+            likesRepository.findByAccountJoinFetch(account).ifPresent(likesRepository::delete);
+        } else {
+            likesRepository.findByAccountJoinFetch(account)
+                    .stream()
+                    .findFirst()
+                    .ifPresentOrElse(likesRepository::delete,
+                            () -> {
+                                throw new IllegalArgumentException(NOT_ALREADY_LIKE);
+                            });
         }
     }
 
@@ -111,7 +109,7 @@ public class LikesServiceImpl implements LikesService {
 
         try {
             log.info("DB로부터 좋아요 개수를 가져왔기 때문에 Redis 업데이트가 필요");
-            for(Likes likes : likesAtBoard) {
+            for (Likes likes : likesAtBoard) {
                 redisUserTemplate.opsForSet().add(redisKey, likes.getUser().getAccount());
             }
             redisUserTemplate.expire(redisKey, LIKE_TTL_HOURS, TimeUnit.HOURS);
@@ -164,7 +162,7 @@ public class LikesServiceImpl implements LikesService {
                 Board board = boardRepository.findById(boardId)
                         .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
 
-                if(board.likeCountUpdateCompare(likeCount)) {
+                if (board.likeCountUpdateCompare(likeCount)) {
                     updateLikesCountToDatabase(boardId, likeCount);
                 }
             }
