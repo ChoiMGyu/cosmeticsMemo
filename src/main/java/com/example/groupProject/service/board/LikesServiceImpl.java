@@ -79,16 +79,20 @@ public class LikesServiceImpl implements LikesService {
         String redisKey = REDIS_LIKE_USER_KEY + boardId;
 
         Boolean alreadyLiked = redisUserTemplate.opsForSet().isMember(redisKey, account);
-        if(!Boolean.TRUE.equals(alreadyLiked)) {
-            throw new IllegalArgumentException(NOT_ALREADY_LIKE);
+        if(Boolean.FALSE.equals(alreadyLiked)) {
+            Likes findLikes = likesRepository.findByAccountJoinFetch(account)
+                    .stream().findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(NOT_ALREADY_LIKE));
+
+            likesRepository.delete(findLikes);
         }
-
-        Likes findLikes = likesRepository.findByAccountJoinFetch(account)
-                .stream().findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(NOT_ALREADY_LIKE));
-
-        redisUserTemplate.opsForSet().remove(redisKey, account);
-        likesRepository.delete(findLikes);
+        else {
+            redisUserTemplate.opsForSet().remove(redisKey, account);
+            if(likesRepository.findByAccountJoinFetch(account).isPresent()){
+                Likes findLikes = likesRepository.findByAccountJoinFetch(account).get();
+                likesRepository.delete(findLikes);
+            }
+        }
     }
 
     private <T> T withFallback(Supplier<T> primary, Supplier<T> fallback) {
