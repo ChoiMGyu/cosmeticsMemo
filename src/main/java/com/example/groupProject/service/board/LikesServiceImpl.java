@@ -140,11 +140,8 @@ public class LikesServiceImpl implements LikesService {
     }
 
     private void updateLikesCountToDatabase(Long boardId, Integer likeCount) {
-        Board findBoard = boardRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
         log.info("Job으로 업데이트될 좋아요의 개수: " + likeCount);
-        findBoard.changeLikeCount(likeCount);
-        boardRepository.save(findBoard);
+        boardRepository.addLikeCount(boardId);
     }
 
     @Override
