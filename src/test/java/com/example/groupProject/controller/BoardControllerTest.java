@@ -8,6 +8,7 @@ import com.example.groupProject.dto.board.BoardDto;
 import com.example.groupProject.dto.board.BoardPageDto;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.board.BoardService;
+import com.example.groupProject.service.board.LikesService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +49,9 @@ public class BoardControllerTest {
 
     @MockBean
     private BoardService boardService;
+
+    @MockBean
+    private LikesService likesService;
 
     @Autowired
     private ObjectMapper objectMapper;
