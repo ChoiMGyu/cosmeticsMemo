@@ -1,5 +1,6 @@
 package com.example.groupProject.service.board;
 
+import com.example.groupProject.config.RedissonConfig;
 import com.example.groupProject.domain.board.Board;
 import com.example.groupProject.domain.board.Likes;
 import com.example.groupProject.domain.user.User;
@@ -34,6 +35,14 @@ public class LikesServiceImpl implements LikesService {
     private final LikesRepository likesRepository;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final RedissonConfig redissonConfig;
+
+    @Override
+    public void increaseLikeLock(Long boardId, String account) {
+        String lockName = "LIKE_LOCK_" + boardId;
+        redissonConfig.execute(lockName, 10000, 10000,
+                () -> doLike(boardId, account));
+    }
 
     @Override
     @Transactional

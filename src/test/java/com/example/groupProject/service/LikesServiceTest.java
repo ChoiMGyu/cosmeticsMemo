@@ -1,5 +1,6 @@
 package com.example.groupProject.service;
 
+import com.example.groupProject.config.RedissonConfig;
 import com.example.groupProject.domain.board.Board;
 import com.example.groupProject.domain.user.RoleType;
 import com.example.groupProject.domain.user.SkinType;
@@ -55,6 +56,9 @@ public class LikesServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RedissonConfig redissonConfig;
+
     private List<User> users;
     private List<Board> boards;
 
@@ -77,6 +81,7 @@ public class LikesServiceTest {
     public void afterEach() {
         likesRepository.deleteAll();
         boardRepository.deleteAll();
+        redisUserTemplate.delete(redisUserTemplate.keys("*"));
     }
 
     @BeforeAll
@@ -98,7 +103,38 @@ public class LikesServiceTest {
     }
 
     @Test
-    @DisplayName("같은 사용자가 같은 게시물에 좋아요를 두 번 누르면 좋아요가 기록되지 않는다")
+    @DisplayName("좋아요 기본 동작 테스트")
+    public void 좋아요_기본동작() throws Exception {
+        //given
+        Long boardId = boards.get(0).getId();
+        String account = users.get(0).getAccount();
+
+        //when
+        likesService.doLike(boardId, account);
+
+        //then
+        assertThat(redisUserTemplate.opsForSet().size("board_users:" + boardId)).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("사용자가 같은 게시글에 좋아요를 두 번 누른다")
+    public void 좋아요_두번() throws Exception {
+        //given
+        Long boardId = boards.get(0).getId();
+        String account = users.get(0).getAccount();
+
+        //when
+        for (int i = 0; i < 2; i++) {
+            likesService.doLike(boardId, account);
+        }
+
+        //then
+        assertThat(redisUserTemplate.opsForSet().size("board_users:" + boardId)).isEqualTo(0);
+    }
+
+
+    @Test
+    @DisplayName("같은 사용자가 같은 게시물에 좋아요를 두 번 누르면 좋아요가 기록되지 않는다(동시성)")
     public void 좋아요_동시성() throws Exception {
         //given
         int threadCount = 100;
@@ -111,7 +147,8 @@ public class LikesServiceTest {
             int idx = i / 2;
             executorService.submit(() -> {
                 try {
-                    likesService.doLike(boardId, users.get(idx).getAccount());
+                    likesService.increaseLikeLock(boardId, users.get(idx).getAccount());
+                    //likesService.doLike(boardId, users.get(idx).getAccount());
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
