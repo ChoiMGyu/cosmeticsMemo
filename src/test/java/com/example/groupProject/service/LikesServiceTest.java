@@ -1,6 +1,5 @@
 package com.example.groupProject.service;
 
-import com.example.groupProject.config.RedissonConfig;
 import com.example.groupProject.domain.board.Board;
 import com.example.groupProject.domain.user.RoleType;
 import com.example.groupProject.domain.user.SkinType;
@@ -55,9 +54,6 @@ public class LikesServiceTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private RedissonConfig redissonConfig;
 
     private List<User> users;
     private List<Board> boards;

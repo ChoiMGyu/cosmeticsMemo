@@ -19,14 +19,14 @@ public class RedissonConfig {
         RLock lock = redissonClient.getLock(lockName);
         try {
             boolean isLocked = lock.tryLock(waitMilliSecond, releaseMilliSecond, TimeUnit.MILLISECONDS);
-            if(!isLocked) {
+            if (!isLocked) {
                 throw new IllegalArgumentException("[" + lockName + "] lock 획득 실패");
             }
-        } catch(InterruptedException e) {
+        } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         } finally {
-            if(lock.isHeldByCurrentThread()) {
+            if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
         }
