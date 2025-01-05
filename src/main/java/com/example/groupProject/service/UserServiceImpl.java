@@ -1,7 +1,7 @@
 package com.example.groupProject.service;
 
 import com.example.groupProject.domain.user.User;
-import com.example.groupProject.repository.user.UserRepositoryImpl;
+import com.example.groupProject.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,9 +13,10 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl {
+    private static final String NOT_EXIST_USER = "존재하지 않는 사용자입니다.";
     private static final String EXIST_USER_MESSAGE = "이미 존재하는 아아디입니다.";
 
-    private final UserRepositoryImpl userRepository;
+    private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
@@ -41,6 +42,7 @@ public class UserServiceImpl {
     }
 
     public User findById(Long id) {
-        return userRepository.findOne(id);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_USER));
     }
 }

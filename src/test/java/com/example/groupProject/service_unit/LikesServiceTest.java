@@ -7,7 +7,7 @@ import com.example.groupProject.domain.user.SkinType;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.repository.board.BoardRepository;
 import com.example.groupProject.repository.board.LikesRepository;
-import com.example.groupProject.repository.user.UserRepositoryImpl;
+import com.example.groupProject.repository.user.UserRepository;
 import com.example.groupProject.service.board.LikesServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +44,7 @@ public class LikesServiceTest {
     private BoardRepository boardRepository;
 
     @Mock
-    private UserRepositoryImpl userRepository;
+    private UserRepository userRepository;
 
     @Mock
     private RedisTemplate<String, String> redisUserTemplate;

@@ -5,7 +5,7 @@ import com.example.groupProject.domain.board.Likes;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.repository.board.BoardRepository;
 import com.example.groupProject.repository.board.LikesRepository;
-import com.example.groupProject.repository.user.UserRepositoryImpl;
+import com.example.groupProject.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,7 +33,7 @@ public class LikesServiceImpl implements LikesService {
     private final RedisTemplate<String, String> redisUserTemplate;
     private final LikesRepository likesRepository;
     private final BoardRepository boardRepository;
-    private final UserRepositoryImpl userRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional

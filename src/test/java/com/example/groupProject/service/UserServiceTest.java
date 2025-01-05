@@ -1,12 +1,13 @@
 package com.example.groupProject.service;
+
 import com.example.groupProject.domain.user.RoleType;
 import com.example.groupProject.domain.user.SkinType;
 import com.example.groupProject.domain.user.User;
-import com.example.groupProject.repository.user.UserRepositoryImpl;
+import com.example.groupProject.repository.user.UserRepository;
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.Test;  // JUnit 5 애너테이션
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -20,7 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -33,7 +34,7 @@ public class UserServiceTest {
     @Autowired
     UserServiceImpl userService;
     @Autowired
-    UserRepositoryImpl userRepository;
+    UserRepository userRepository;
     @Autowired
     EntityManager em;
 
@@ -66,8 +67,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("아이디가 동일한 경우 예외를 발생시킨다.")
-    public void 중복_회원_예외() throws Exception
-    {
+    public void 중복_회원_예외() throws Exception {
         //given
         User user = User.createUser(
                 "account",

@@ -3,7 +3,7 @@ package com.example.groupProject.service_unit;
 import com.example.groupProject.domain.user.RoleType;
 import com.example.groupProject.domain.user.SkinType;
 import com.example.groupProject.domain.user.User;
-import com.example.groupProject.repository.user.UserRepositoryImpl;
+import com.example.groupProject.repository.user.UserRepository;
 import com.example.groupProject.service.UserServiceImpl;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 public class UserServiceTest {
 
     @Mock
-    private UserRepositoryImpl userRepository;
+    private UserRepository userRepository;
 
     @Mock
     private EntityManager em;
@@ -63,7 +63,7 @@ public class UserServiceTest {
     public void 회원가입() throws Exception {
         //given
         when(user.getId()).thenReturn(1L);
-        doNothing().when(userRepository).save(any(User.class));
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         //when
         Long id = userService.join(user);

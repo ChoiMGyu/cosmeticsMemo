@@ -2,7 +2,7 @@ package com.example.groupProject.service.authService;
 
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
-import com.example.groupProject.repository.user.UserRepositoryImpl;
+import com.example.groupProject.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,7 +16,7 @@ import java.util.List;
 public class CustomUserDetailsService implements UserDetailsService {
     private static final String NOT_FOUND_USER_MESSAGE = "사용자를 찾을 수 없습니다.";
 
-    private final UserRepositoryImpl userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String account) throws UsernameNotFoundException {

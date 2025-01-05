@@ -5,7 +5,7 @@ import com.example.groupProject.domain.user.RoleType;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.repository.memo.SkincareRepository;
 import com.example.groupProject.repository.memo.SkincareSpecifications;
-import com.example.groupProject.repository.user.UserRepositoryImpl;
+import com.example.groupProject.repository.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ public class SkincareRepositoryTest {
     private EntityManager em;
 
     @Autowired
-    private UserRepositoryImpl userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private SkincareRepository skincareRepository;
