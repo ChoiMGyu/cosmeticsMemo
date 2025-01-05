@@ -82,90 +82,49 @@ public class LikesServiceTest {
                 .build();
     }
 
-    private static Stream<Arguments> provideIncrementLikeTestCase() {
+    private static Stream<Arguments> provideLikeTestCase() {
         return Stream.of(
                 Arguments.of("사용자가 좋아요를 처음 눌렀을 때(Redis - X, DB - X) 게시글의 좋아요 수가 증가한다", false, false, false),
-                Arguments.of("사용자가 좋아요를 이미 누른 경우(Redis - O, DB - X)에는 좋아요 수는 변하지 않는다", true, false, true),
-                Arguments.of("사용자가 좋아요를 이미 누른 경우(Redis - X, DB - O)에는 게시글의 좋아요 수는 변하지 않는다", false, true, true),
-                Arguments.of("사용자가 좋아요를 이미 누른 경우(Redis - O, DB - O)에는 게시글의 좋아요 수는 변하지 않는다", true, true, true)
+                Arguments.of("사용자가 좋아요를 이미 누른 경우(Redis - O, DB - X) 게시글의 좋아요 수는 감소한다", true, false, true),
+                Arguments.of("사용자가 좋아요를 이미 누른 경우(Redis - X, DB - O) 게시글의 좋아요 수는 감소한다", false, true, true),
+                Arguments.of("사용자가 좋아요를 이미 누른 경우(Redis - O, DB - O) 게시글의 좋아요 수는 감소한다", true, true, true)
         );
     }
 
     @ParameterizedTest(name = "{index} - {0}")
-    @MethodSource("provideIncrementLikeTestCase")
-    @DisplayName("게시글 좋아요 증가 테스트")
-    public void 게시글_좋아요_증가(String description, boolean redisExist, boolean dbExist, boolean isExceptionThrow) throws Exception {
+    @MethodSource("provideLikeTestCase")
+    @DisplayName("게시글 좋아요 테스트")
+    public void 게시글_좋아요_테스트(String description, boolean redisExist, boolean dbExist) {
         //given
         long findBoardId = 1L;
         String redisKey = "board_users:" + findBoardId;
 
         when(redisUserTemplate.opsForSet()).thenReturn(setOperations);
+
         when(boardRepository.findById(findBoardId)).thenReturn(Optional.of(board));
         when(userRepository.findByAccount(anyString())).thenReturn(List.of(user));
-        when(setOperations.isMember(eq(redisKey), anyString())).thenReturn(redisExist);
 
-        if (!redisExist) {
-            if (dbExist) {
-                when(likesRepository.findByUserAndBoard(any(User.class), any(Board.class)))
-                        .thenReturn(Optional.of(Likes.builder().user(user).board(board).build()));
-            } else {
-                when(likesRepository.findByUserAndBoard(any(User.class), any(Board.class))).thenReturn(Optional.empty());
-            }
+        when(setOperations.isMember(eq(redisKey), anyString())).thenReturn(redisExist);
+        if (dbExist) {
+            when(likesRepository.findByUserAndBoard(any(User.class), any(Board.class)))
+                    .thenReturn(Optional.of(Likes.builder().user(user).board(board).build()));
+        } else {
+            when(likesRepository.findByUserAndBoard(any(User.class), any(Board.class))).thenReturn(Optional.empty());
         }
 
         //when
         //then
-        if (isExceptionThrow) {
-            assertThrows(IllegalArgumentException.class,
-                    () -> likesService.incrementLike(findBoardId, user.getAccount()));
-        } else {
-            likesService.incrementLike(findBoardId, user.getAccount());
-            verify(redisUserTemplate.opsForSet(), times(1)).add(eq(redisKey), eq(user.getAccount()));
-            verify(likesRepository, times(1)).save(any(Likes.class));
-        }
-    }
-
-    private static Stream<Arguments> provideDecrementLikeTestCase() {
-        return Stream.of(
-                Arguments.of("사용자가 좋아요를 누른 경우(Redis - O, DB - O)에만 숫자가 감소한다", true, true, false),
-                Arguments.of("사용자가 좋아요를 누른 경우(Redis - O, DB - X)에만 숫자가 감소한다", true, false, false),
-                Arguments.of("사용자가 좋아요를 누른 경우(Redis - X, DB - O)에만 숫자가 감소한다", false, true, false),
-                Arguments.of("사용자가 좋아요를 누르지 않았을 경우(Redis - X, DB - X)에는 숫자가 감소하지 않는다", false, false, true)
-        );
-    }
-
-    @ParameterizedTest(name = "{index} - {0}")
-    @MethodSource("provideDecrementLikeTestCase")
-    @DisplayName("게시글 좋아요 감소 테스트")
-    public void 게시글_좋아요_감소(String description, boolean redisExist, boolean dbExist, boolean isNotAlreadyLike) {
-        // given
-        long findBoardId = 1L;
-        String redisKey = "board_users:" + findBoardId;
-
-        when(redisUserTemplate.opsForSet()).thenReturn(setOperations);
-        when(boardRepository.existsById(findBoardId)).thenReturn(true);
-        when(setOperations.isMember(redisKey, user.getAccount())).thenReturn(redisExist);
-
-        if (dbExist) {
-            when(likesRepository.findByAccountJoinFetch(user.getAccount()))
-                    .thenReturn(Optional.of(Likes.builder().user(user).board(board).build()));
-        } else {
-            when(likesRepository.findByAccountJoinFetch(user.getAccount())).thenReturn(Optional.empty());
-        }
-
-        // when
-        // then
-        if (isNotAlreadyLike) {
-            assertThrows(IllegalArgumentException.class,
-                    () -> likesService.decrementLike(findBoardId, user.getAccount()));
-        } else {
-            likesService.decrementLike(findBoardId, user.getAccount());
+        likesService.doLike(findBoardId, user.getAccount());
+        if (redisExist || dbExist) {
             if (redisExist) {
                 verify(redisUserTemplate.opsForSet(), times(1)).remove(redisKey, user.getAccount());
             }
             if (dbExist) {
                 verify(likesRepository, times(1)).delete(any(Likes.class));
             }
+        } else {
+            verify(redisUserTemplate.opsForSet(), times(1)).add(eq(redisKey), eq(user.getAccount()));
+            verify(likesRepository, times(1)).save(any(Likes.class));
         }
     }
 

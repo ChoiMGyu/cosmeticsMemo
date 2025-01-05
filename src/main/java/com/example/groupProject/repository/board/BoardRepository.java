@@ -10,6 +10,6 @@ import org.springframework.data.repository.query.Param;
 public interface BoardRepository extends JpaRepository<Board, Long>, JpaSpecificationExecutor<Board> {
 
     @Modifying(clearAutomatically = true)
-    @Query("update Board b set b.like = b.like + 1 where b.id = :boardId")
-    void addLikeCount(@Param("boardId") Long boardId);
+    @Query("update Board b set b.like = :likeCount where b.id = :boardId")
+    void addLikeCount(@Param("boardId") Long boardId, @Param("likeCount") Integer likeCount);
 }

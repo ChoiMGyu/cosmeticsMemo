@@ -37,59 +37,53 @@ public class LikesServiceImpl implements LikesService {
 
     @Override
     @Transactional
-    public void incrementLike(Long boardId, String account) {
+    public void doLike(Long boardId, String account) {
+        // 게시글 존재 여부 확인
         Board findBoard = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
 
+        // 사용자 존재 여부 확인
         User findUser = userRepository.findByAccount(account)
                 .stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_USER));
 
         String redisKey = REDIS_LIKE_USER_KEY + boardId;
 
-        Boolean alreadyLiked = redisUserTemplate.opsForSet().isMember(redisKey, account);
-        if (Boolean.TRUE.equals(alreadyLiked)) {
-            log.info("Redis에 저장된 사용자 - 좋아요 증가");
-            throw new IllegalArgumentException(ALREADY_LIKE);
-        }
+        // Redis에서 좋아요 상태 확인
+        Boolean redisPresent = redisUserTemplate.opsForSet().isMember(redisKey, account);
 
-        likesRepository.findByUserAndBoard(findUser, findBoard)
-                .ifPresent(like -> {
-                    log.info("DB에 저장된 사용자 - 좋아요 증가");
-                    throw new IllegalArgumentException(ALREADY_LIKE);
-                });
+        //DB에서 좋아요 상태 확인
+        boolean dbPresent = likesRepository.findByUserAndBoard(findUser, findBoard).isPresent();
 
-        redisUserTemplate.opsForSet().add(redisKey, account);
-        redisUserTemplate.expire(redisKey, LIKE_TTL_HOURS, TimeUnit.HOURS);
-
-        Likes likes = Likes.builder()
-                .board(findBoard)
-                .user(findUser)
-                .build();
-        likesRepository.save(likes);
-    }
-
-    @Override
-    @Transactional
-    public void decrementLike(Long boardId, String account) {
-        if (!boardRepository.existsById(boardId)) {
-            throw new IllegalArgumentException(NOT_EXIST_BOARD);
-        }
-
-        String redisKey = REDIS_LIKE_USER_KEY + boardId;
-
-        Boolean alreadyLiked = redisUserTemplate.opsForSet().isMember(redisKey, account);
-        if (Boolean.TRUE.equals(alreadyLiked)) {
-            redisUserTemplate.opsForSet().remove(redisKey, account);
-            likesRepository.findByAccountJoinFetch(account).ifPresent(likesRepository::delete);
+        if (Boolean.TRUE.equals(redisPresent) || dbPresent) {
+            // 이미 좋아요 상태: 좋아요 취소
+            log.info("좋아요 취소 처리");
+            if (Boolean.TRUE.equals(redisPresent)) {
+                log.info("Redis에 저장되어 있던 좋아요 삭제");
+                redisUserTemplate.opsForSet().remove(redisKey, account);
+            }
+            if (dbPresent) {
+                log.info("DB에 저장되어 있던 좋아요 삭제");
+                likesRepository.findByUserAndBoard(findUser, findBoard)
+                        .ifPresentOrElse(
+                                likesRepository::delete,
+                                () -> {
+                                    throw new IllegalArgumentException(NOT_ALREADY_LIKE);
+                                }
+                        );
+            }
+            ;
         } else {
-            likesRepository.findByAccountJoinFetch(account)
-                    .stream()
-                    .findFirst()
-                    .ifPresentOrElse(likesRepository::delete,
-                            () -> {
-                                throw new IllegalArgumentException(NOT_ALREADY_LIKE);
-                            });
+            // 좋아요 추가
+            log.info("좋아요 추가 처리 - Redis와 DB 업데이트");
+            redisUserTemplate.opsForSet().add(redisKey, account);
+            redisUserTemplate.expire(redisKey, LIKE_TTL_HOURS, TimeUnit.HOURS);
+
+            Likes likes = Likes.builder()
+                    .board(findBoard)
+                    .user(findUser)
+                    .build();
+            likesRepository.save(likes);
         }
     }
 
@@ -139,11 +133,6 @@ public class LikesServiceImpl implements LikesService {
         );
     }
 
-    private void updateLikesCountToDatabase(Long boardId, Integer likeCount) {
-        log.info("Job으로 업데이트될 좋아요의 개수: " + likeCount);
-        boardRepository.addLikeCount(boardId);
-    }
-
     @Override
     @Transactional
     public void syncLikesToDatabase() {
@@ -160,7 +149,7 @@ public class LikesServiceImpl implements LikesService {
                         .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
 
                 if (board.likeCountUpdateCompare(likeCount)) {
-                    updateLikesCountToDatabase(boardId, likeCount);
+                    boardRepository.addLikeCount(boardId, likeCount);
                 }
             }
         }

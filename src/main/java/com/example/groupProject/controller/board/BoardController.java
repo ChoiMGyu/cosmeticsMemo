@@ -93,22 +93,8 @@ public class BoardController {
 
         logger.info("좋아요를 증가시키는 메소드가 호출되었습니다.");
 
-        likesService.incrementLike(boardId, customUserDetails.getUsername());
+        likesService.doLike(boardId, customUserDetails.getUsername());
 
         return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_LIKE_BUTTON_MESSAGE);
-    }
-
-    @DeleteMapping("/board/like")
-    public ResponseEntity<String> decrementLike(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                @RequestParam(value = "id") Long boardId) {
-        if (customUserDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage());
-        }
-
-        logger.info("좋아요를 감소시키는 메소드가 호출되었습니다.");
-
-        likesService.decrementLike(boardId, customUserDetails.getUsername());
-
-        return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_DISLIKE_BUTTON_MESSAGE);
     }
 }
