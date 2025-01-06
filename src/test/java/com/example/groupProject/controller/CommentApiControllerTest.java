@@ -6,6 +6,7 @@ import com.example.groupProject.domain.board.Board;
 import com.example.groupProject.domain.board.Comment;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.board.comment.CommentDto;
+import com.example.groupProject.dto.board.comment.CommentUpdateDto;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.board.CommentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,10 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = CommentApiController.class)
@@ -98,4 +101,30 @@ public class CommentApiControllerTest {
                         .content(content))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("게시글에 작성된 댓글을 수정한다")
+    @WithMockCustomUser
+    public void 댓글_수정() throws Exception {
+        //given
+        Long boardId = 1L;
+        Long commentId = 1L;
+        CommentUpdateDto commentUpdateDto = CommentUpdateDto.create(commentId, "account_test", "수정된 댓글입니다.");
+        String content = objectMapper.writeValueAsString(commentUpdateDto);
+
+        doNothing().when(commentService).update(any(Long.class), any(CommentUpdateDto.class));
+
+        //when
+
+        //then
+        mockMvc.perform(put("/api/comments/{boardId}/comment", boardId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        verify(commentService).update(eq(boardId), any(CommentUpdateDto.class));
+    }
+
 }
