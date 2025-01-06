@@ -1,7 +1,7 @@
 package com.example.groupProject.controller;
 
 import com.example.groupProject.annotation.WithMockCustomUser;
-import com.example.groupProject.controller.board.BoardController;
+import com.example.groupProject.controller.board.BoardApiController;
 import com.example.groupProject.domain.board.Board;
 import com.example.groupProject.domain.board.Comment;
 import com.example.groupProject.domain.user.User;
@@ -31,7 +31,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -40,11 +39,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = BoardController.class)
+@WebMvcTest(value = BoardApiController.class)
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.yml")
-public class BoardControllerTest {
+public class BoardApiControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -80,7 +79,7 @@ public class BoardControllerTest {
                 .master(user)
                 .build());
 
-        for(int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             Comment comment = spy(Comment.builder()
                     .content("댓글입니다 + " + i)
                     .board(board)
@@ -229,6 +228,4 @@ public class BoardControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
-
-
 }

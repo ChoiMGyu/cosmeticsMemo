@@ -1,7 +1,6 @@
 package com.example.groupProject.controller.board;
 
 import com.example.groupProject.controller.message.ErrorMessage;
-import com.example.groupProject.domain.board.Comment;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.board.BoardAllDto;
 import com.example.groupProject.dto.board.BoardDto;
@@ -28,7 +27,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/boards")
-public class BoardController {
+public class BoardApiController {
     private static final int BOARD_WRITER = 0;
     private static final String SUCCESS_CREATE_BOARD_MESSAGE = "게시물을 성공적으로 게시하였습니다.";
     private static final String SUCCESS_DELETE_BOARD_MESSAGE = "게시물을 성공적으로 삭제하였습니다.";
@@ -36,7 +35,7 @@ public class BoardController {
     private static final String SUCCESS_LIKE_BUTTON_MESSAGE = "게시물의 좋아요를 성공적으로 눌렀습니다.";
     private static final String SUCCESS_DISLIKE_BUTTON_MESSAGE = "게시물의 좋아요를 성공적으로 취소하였습니다.";
 
-    private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
+    private static final Logger logger = LoggerFactory.getLogger(BoardApiController.class);
 
     private final BoardService boardService;
     private final UserServiceImpl userService;
