@@ -30,8 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -125,6 +124,28 @@ public class CommentApiControllerTest {
                 .andDo(print());
 
         verify(commentService).update(eq(boardId), any(CommentUpdateDto.class));
+    }
+
+    @Test
+    @DisplayName("게시글의 작성된 댓글을 삭제한다")
+    @WithMockCustomUser
+    public void 댓글_삭제() throws Exception {
+        //given
+        Long boardId = 1L;
+        Long commentId = 1L;
+
+        doNothing().when(commentService).delete(any(Long.class), any(Long.class), anyString());
+
+        //when
+
+        //then
+        mockMvc.perform(delete("/api/comments/{boardId}/comment/{commentId}", boardId, commentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        verify(commentService).delete(eq(boardId), eq(commentId), anyString());
     }
 
 }

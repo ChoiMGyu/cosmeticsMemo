@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommentApiController {
     private static final String SUCCESS_CREATE_COMMENT_MESSAGE = "게시물에 댓글을 성공적으로 달았습니다.";
     private static final String SUCCESS_UPDATE_COMMENT_MESSAGE = "게시물에 댓글을 성공적으로 수정했습니다.";
+    private static final String SUCCESS_DELETE_COMMENT_MESSAGE = "게시물에 댓글을 성공적으로 삭제했습니다.";
 
     private final CommentService commentService;
 
@@ -48,5 +49,19 @@ public class CommentApiController {
         commentService.update(boardId, commentUpdateDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_UPDATE_COMMENT_MESSAGE);
+    }
+
+    @DeleteMapping("/{boardId}/comment/{commentId}")
+    public ResponseEntity<String> deleteSkincareMemo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                     @PathVariable(value = "boardId") Long boardId,
+                                                     @PathVariable(value = "commentId") Long commentId) {
+
+        if (customUserDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorMessage.LOGIN_REQUIRED_MESSAGE.getMessage());
+        }
+
+        commentService.delete(boardId, commentId, customUserDetails.getUsername());
+
+        return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_DELETE_COMMENT_MESSAGE);
     }
 }
