@@ -4,6 +4,7 @@ import com.example.groupProject.domain.board.Board;
 import com.example.groupProject.domain.board.Comment;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.board.comment.CommentDto;
+import com.example.groupProject.dto.board.comment.CommentReadDto;
 import com.example.groupProject.dto.board.comment.CommentUpdateDto;
 import com.example.groupProject.repository.board.BoardRepository;
 import com.example.groupProject.repository.board.CommentRepository;
@@ -12,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -69,4 +73,18 @@ public class CommentServiceImpl implements CommentService {
 
         commentRepository.delete(comment);
     }
+
+    @Override
+    public List<CommentReadDto> findAll(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
+
+        List<Comment> comments = commentRepository.findAllByBoardId(boardId);
+
+        return comments.stream()
+                .map(CommentReadDto::from)
+                .collect(Collectors.toList());
+    }
+
+
 }

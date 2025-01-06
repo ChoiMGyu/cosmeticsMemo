@@ -6,6 +6,7 @@ import com.example.groupProject.domain.user.RoleType;
 import com.example.groupProject.domain.user.SkinType;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.board.comment.CommentDto;
+import com.example.groupProject.dto.board.comment.CommentReadDto;
 import com.example.groupProject.dto.board.comment.CommentUpdateDto;
 import com.example.groupProject.repository.board.BoardRepository;
 import com.example.groupProject.repository.board.CommentRepository;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -170,10 +172,26 @@ public class CommentServiceTest {
     public void 댓글_읽기() throws Exception
     {
         //given
+        Comment comment1 = Comment.builder()
+                .content("1댓글입니다.")
+                .board(board)
+                .master(user)
+                .build();
+        commentRepository.save(comment1);
+
+        Comment comment2 = Comment.builder()
+                .content("2댓글입니다.")
+                .board(board)
+                .master(user)
+                .build();
+        commentRepository.save(comment2);
 
         //when
+        List<CommentReadDto> comments = commentService.findAll(board.getId());
 
         //then
+        assertThat(comments.size()).isEqualTo(2);
+        assertThat(comments.getFirst().getContent()).isEqualTo("1댓글입니다.");
     }
 
 }
