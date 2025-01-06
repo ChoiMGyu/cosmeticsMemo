@@ -56,4 +56,17 @@ public class CommentServiceImpl implements CommentService {
 
         comment.changeContent(commentUpdateDto.getContent());
     }
+
+    @Override
+    public void delete(Long boardId, Long commentId, String writer) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_BOARD));
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_COMMENT));
+
+        comment.isSameWriter(writer);
+
+        commentRepository.delete(comment);
+    }
 }

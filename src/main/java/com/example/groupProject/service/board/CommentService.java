@@ -8,4 +8,6 @@ public interface CommentService {
     Long save(Long boardId, CommentDto commentDto);
 
     void update(Long boardId, CommentUpdateDto commentUpdateDto);
+
+    void delete(Long boardId, Long commentId, String writer);
 }

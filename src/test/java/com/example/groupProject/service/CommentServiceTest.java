@@ -126,10 +126,18 @@ public class CommentServiceTest {
     public void 댓글_삭제() throws Exception
     {
         //given
+        Comment comment = Comment.builder()
+                .content("댓글입니다.")
+                .board(board)
+                .master(user)
+                .build();
+        commentRepository.save(comment);
 
         //when
+        commentService.delete(board.getId(), comment.getId(), user.getAccount());
 
         //then
+        assertThat(commentRepository.existsById(comment.getId())).isFalse();
     }
 
     @Test
