@@ -76,7 +76,8 @@ public class SecurityConfig {
         return new String[]{
                 "/login", "/", "/join", "/api/user/new",
                 "/alarm", "/send", "/reissue",
-                "/test/not", "/test/user"
+                "/test/not", "/test/user",
+                "/api/boards/board/{boardId}/comments"
         };
     }
 

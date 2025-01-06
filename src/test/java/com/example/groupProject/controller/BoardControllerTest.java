@@ -3,11 +3,14 @@ package com.example.groupProject.controller;
 import com.example.groupProject.annotation.WithMockCustomUser;
 import com.example.groupProject.controller.board.BoardController;
 import com.example.groupProject.domain.board.Board;
+import com.example.groupProject.domain.board.Comment;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.board.BoardDto;
 import com.example.groupProject.dto.board.BoardPageDto;
+import com.example.groupProject.dto.board.comment.CommentReadDto;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.board.BoardService;
+import com.example.groupProject.service.board.CommentService;
 import com.example.groupProject.service.board.LikesService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -26,7 +29,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -53,11 +58,15 @@ public class BoardControllerTest {
     @MockBean
     private LikesService likesService;
 
+    @MockBean
+    private CommentService commentService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     private User user;
     private Board board;
+    private List<Comment> comments = new ArrayList<>();
 
     @BeforeEach
     public void setUp() {
@@ -70,6 +79,15 @@ public class BoardControllerTest {
                 .hit(0)
                 .master(user)
                 .build());
+
+        for(int i = 0; i < 3; i++) {
+            Comment comment = spy(Comment.builder()
+                    .content("댓글입니다 + " + i)
+                    .board(board)
+                    .master(user)
+                    .build());
+            comments.add(comment);
+        }
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
@@ -189,6 +207,27 @@ public class BoardControllerTest {
                 .andDo(print());
 
         verify(boardService).findAllBoardPaging(any(BoardPageDto.class));
+    }
+
+    @Test
+    @DisplayName("게시글에 저장된 댓글들을 불러온다")
+    @WithMockUser
+    public void 게시글_댓글_조회() throws Exception {
+        //given
+        Long boardId = 1L;
+        List<CommentReadDto> commentReadDtos = comments.stream()
+                .limit(3)
+                .map(CommentReadDto::from)
+                .toList();
+
+        //when
+        when(commentService.findAll(boardId)).thenReturn(commentReadDtos);
+
+        //then
+        mockMvc.perform(get("/api/boards/board/{boardId}/comments", boardId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
 

@@ -6,6 +6,8 @@ import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.board.BoardAllDto;
 import com.example.groupProject.dto.board.BoardDto;
 import com.example.groupProject.dto.board.BoardPageDto;
+import com.example.groupProject.dto.board.comment.CommentAllDto;
+import com.example.groupProject.dto.board.comment.CommentReadDto;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.board.BoardService;
@@ -99,5 +101,15 @@ public class BoardController {
         likesService.doLike(boardId, customUserDetails.getUsername());
 
         return ResponseEntity.status(HttpStatus.OK).body(SUCCESS_LIKE_BUTTON_MESSAGE);
+    }
+
+    @GetMapping("/board/{boardId}/comments")
+    public ResponseEntity<CommentAllDto> findAllBoardComments(@PathVariable(value = "boardId") Long boardId) {
+
+        logger.info("게시글에 대한 댓글을 모두 조회하였습니다.");
+
+        List<CommentReadDto> comments = commentService.findAll(boardId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(CommentAllDto.from(comments));
     }
 }
