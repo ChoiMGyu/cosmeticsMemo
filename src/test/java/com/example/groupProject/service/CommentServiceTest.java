@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -145,10 +146,22 @@ public class CommentServiceTest {
     public void 댓글_작성자X_수정_삭제_시도() throws Exception
     {
         //given
+        Comment comment = Comment.builder()
+                .content("댓글입니다.")
+                .board(board)
+                .master(user)
+                .build();
+        commentRepository.save(comment);
+
+        CommentUpdateDto commentUpdateDto = CommentUpdateDto.create(comment.getId(), "testUser", "수정할 댓글입니다.");
 
         //when
 
         //then
+        assertThatThrownBy(() -> commentService.update(board.getId(), commentUpdateDto))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> commentService.delete(board.getId(), comment.getId(), "testUser"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
 
