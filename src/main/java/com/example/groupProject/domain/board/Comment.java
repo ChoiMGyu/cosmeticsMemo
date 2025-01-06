@@ -26,7 +26,7 @@ public class Comment extends Timestamped {
     @JoinColumn(name = "master_id")
     private User master;
 
-    public void setBoard(Board board) {
-        this.board = board;
+    public boolean isSameWriter(String writer) {
+        return writer.equals(master.getAccount());
     }
 }

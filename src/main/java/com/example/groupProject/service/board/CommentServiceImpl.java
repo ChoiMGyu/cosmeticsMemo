@@ -37,7 +37,6 @@ public class CommentServiceImpl implements CommentService {
                 .master(user)
                 .build();
 
-        board.addComment(comment);
         commentRepository.save(comment);
 
         return comment.getId();

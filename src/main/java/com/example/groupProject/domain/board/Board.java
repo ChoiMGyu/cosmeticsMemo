@@ -37,11 +37,6 @@ public class Board extends Timestamped {
     @JoinColumn(name = "master_id")
     private User master;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @OrderBy("id asc")
-    private List<Comment> comments = new ArrayList<>();
-
     public void changeBoard(String title, String content) {
         this.title = title;
         this.content = content;
@@ -72,10 +67,5 @@ public class Board extends Timestamped {
     public boolean likeCountUpdateCompare(int likeCount) {
         if (this.like != likeCount) return true;
         else return false;
-    }
-
-    public void addComment(Comment comment) {
-        this.comments.add(comment);
-        comment.setBoard(this);
     }
 }
