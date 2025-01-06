@@ -1,5 +1,6 @@
 package com.example.groupProject.domain.board;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public abstract class Timestamped {
     private String createdBy;
 
     @CreatedDate
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate

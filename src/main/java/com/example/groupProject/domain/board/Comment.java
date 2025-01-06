@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Comment extends Timestamped {
+    private static final String NOT_SAME_WRITER = "댓글 작성자가 일치하지 않습니다.";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +27,13 @@ public class Comment extends Timestamped {
     @JoinColumn(name = "master_id")
     private User master;
 
-    public boolean isSameWriter(String writer) {
-        return writer.equals(master.getAccount());
+    public void isSameWriter(String writer) {
+        if (!writer.equals(master.getAccount())) {
+            throw new IllegalArgumentException(NOT_SAME_WRITER);
+        }
+    }
+
+    public void changeContent(String content) {
+        this.content = content;
     }
 }

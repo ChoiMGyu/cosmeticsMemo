@@ -5,28 +5,26 @@ import com.example.groupProject.domain.board.Comment;
 import com.example.groupProject.domain.user.RoleType;
 import com.example.groupProject.domain.user.SkinType;
 import com.example.groupProject.domain.user.User;
-import com.example.groupProject.dto.board.CommentDto;
+import com.example.groupProject.dto.board.comment.CommentDto;
+import com.example.groupProject.dto.board.comment.CommentUpdateDto;
 import com.example.groupProject.repository.board.BoardRepository;
 import com.example.groupProject.repository.board.CommentRepository;
-import com.example.groupProject.repository.board.LikesRepository;
 import com.example.groupProject.repository.user.UserRepository;
 import com.example.groupProject.service.board.CommentService;
-import com.example.groupProject.service.board.LikesService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -104,10 +102,23 @@ public class CommentServiceTest {
     public void 댓글_수정() throws Exception
     {
         //given
+        Comment comment = Comment.builder()
+                .content("댓글입니다.")
+                .board(board)
+                .master(user)
+                .build();
+        commentRepository.save(comment);
+
+        LocalDateTime initialModifiedAt = comment.getModifiedAt();
+        String updateContent = "수정할 댓글 내용입니다.";
+        CommentUpdateDto commentUpdateDto = CommentUpdateDto.create(comment.getId(), user.getAccount(), updateContent);
 
         //when
+        commentService.update(board.getId(), commentUpdateDto);
+        em.flush();
 
         //then
+        assertThat(comment.getContent()).isEqualTo(updateContent);
     }
 
     @Test
