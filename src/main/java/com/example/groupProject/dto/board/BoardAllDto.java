@@ -1,6 +1,5 @@
 package com.example.groupProject.dto.board;
 
-import com.example.groupProject.dto.memo.SkincareDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

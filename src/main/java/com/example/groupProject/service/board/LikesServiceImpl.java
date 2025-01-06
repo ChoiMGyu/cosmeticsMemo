@@ -29,7 +29,7 @@ public class LikesServiceImpl implements LikesService {
     private static final String NOT_EXIST_USER = "로그인한 사용자만 좋아요를 누를 수 있습니다.";
     private static final String ALREADY_LIKE = "좋아요는 게시물 당 한 번만 누를 수 있습니다.";
     private static final String NOT_ALREADY_LIKE = "좋아요를 누르지 않은 게시물입니다.";
-    private static final String REDIS_LIKE_USER_KEY = "board_users:";
+    private static final String REDIS_LIKE_USER_KEY_PREFIX = "board_users:";
 
     private final RedisTemplate<String, String> redisUserTemplate;
     private final LikesRepository likesRepository;
@@ -56,7 +56,7 @@ public class LikesServiceImpl implements LikesService {
                 .stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_USER));
 
-        String redisKey = REDIS_LIKE_USER_KEY + boardId;
+        String redisKey = REDIS_LIKE_USER_KEY_PREFIX + boardId;
 
         // Redis에서 좋아요 상태 확인
         Boolean redisPresent = redisUserTemplate.opsForSet().isMember(redisKey, account);
@@ -125,7 +125,7 @@ public class LikesServiceImpl implements LikesService {
 
     @Override
     public int getLikesCount(Long boardId) {
-        String redisKey = REDIS_LIKE_USER_KEY + boardId;
+        String redisKey = REDIS_LIKE_USER_KEY_PREFIX + boardId;
 
         return withFallback(
                 () -> {
@@ -145,11 +145,11 @@ public class LikesServiceImpl implements LikesService {
     @Override
     @Transactional
     public void syncLikesToDatabase() {
-        Set<String> keys = redisUserTemplate.keys(REDIS_LIKE_USER_KEY + "*");
+        Set<String> keys = redisUserTemplate.keys(REDIS_LIKE_USER_KEY_PREFIX + "*");
 
         if (keys != null) {
             for (String key : keys) {
-                Long boardId = Long.parseLong(key.replace(REDIS_LIKE_USER_KEY, ""));
+                Long boardId = Long.parseLong(key.replace(REDIS_LIKE_USER_KEY_PREFIX , ""));
                 Integer likeCount = Optional.ofNullable(redisUserTemplate.opsForSet().size(key))
                         .map(Long::intValue)
                         .orElse(LIKE_INITIAL_COUNT);

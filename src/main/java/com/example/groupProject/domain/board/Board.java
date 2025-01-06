@@ -4,6 +4,9 @@ import com.example.groupProject.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,6 +36,11 @@ public class Board extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_id")
     private User master;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OrderBy("id asc")
+    private List<Comment> comments = new ArrayList<>();
 
     public void changeBoard(String title, String content) {
         this.title = title;
@@ -64,5 +72,10 @@ public class Board extends Timestamped {
     public boolean likeCountUpdateCompare(int likeCount) {
         if (this.like != likeCount) return true;
         else return false;
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+        comment.setBoard(this);
     }
 }

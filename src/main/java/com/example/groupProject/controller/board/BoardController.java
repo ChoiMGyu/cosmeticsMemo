@@ -1,6 +1,7 @@
 package com.example.groupProject.controller.board;
 
 import com.example.groupProject.controller.message.ErrorMessage;
+import com.example.groupProject.domain.board.Comment;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.board.BoardAllDto;
 import com.example.groupProject.dto.board.BoardDto;
@@ -8,6 +9,7 @@ import com.example.groupProject.dto.board.BoardPageDto;
 import com.example.groupProject.dto.jwt.CustomUserDetails;
 import com.example.groupProject.service.UserServiceImpl;
 import com.example.groupProject.service.board.BoardService;
+import com.example.groupProject.service.board.CommentService;
 import com.example.groupProject.service.board.LikesService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class BoardController {
     private final BoardService boardService;
     private final UserServiceImpl userService;
     private final LikesService likesService;
+    private final CommentService commentService;
 
     @GetMapping("/board")
     public ResponseEntity<BoardAllDto> findAllBoards(@RequestBody BoardPageDto boardPageDto) {

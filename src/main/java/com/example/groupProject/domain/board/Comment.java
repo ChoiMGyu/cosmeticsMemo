@@ -25,4 +25,8 @@ public class Comment extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_id")
     private User master;
+
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 }
