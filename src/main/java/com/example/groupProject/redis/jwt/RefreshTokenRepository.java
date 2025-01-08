@@ -1,4 +1,4 @@
-package com.example.groupProject.repository.jwt;
+package com.example.groupProject.redis.jwt;
 
 import com.example.groupProject.domain.jwt.RefreshToken;
 import org.springframework.data.repository.CrudRepository;

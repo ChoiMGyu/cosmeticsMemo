@@ -1,7 +1,7 @@
 package com.example.groupProject.config.filter;
 
 import com.example.groupProject.config.util.JWTUtil;
-import com.example.groupProject.repository.jwt.RefreshTokenRepository;
+import com.example.groupProject.redis.jwt.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

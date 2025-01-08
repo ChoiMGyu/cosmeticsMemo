@@ -3,7 +3,7 @@ package com.example.groupProject.service.authService;
 import com.example.groupProject.config.util.JWTUtil;
 import com.example.groupProject.domain.jwt.RefreshToken;
 import com.example.groupProject.dto.jwt.TokenDto;
-import com.example.groupProject.repository.jwt.RefreshTokenRepository;
+import com.example.groupProject.redis.jwt.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

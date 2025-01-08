@@ -1,6 +1,6 @@
 package com.example.groupProject.config;
 
-import com.example.groupProject.repository.jwt.RefreshTokenRepository;
+import com.example.groupProject.redis.jwt.RefreshTokenRepository;
 import com.example.groupProject.service.authService.JwtService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
