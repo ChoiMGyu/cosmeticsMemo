@@ -7,9 +7,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "com.example.groupProject.repository")
-@EnableMongoRepositories(basePackages = "com.example.groupProject.mongo")
-@EnableRedisRepositories(basePackages = "com.example.groupProject.redis")
 public class GroupProjectApplication {
 
     public static void main(String[] args) {
