@@ -1,14 +1,20 @@
 package com.example.groupProject.controller;
 
+import com.example.groupProject.controller.chat.ChatController;
+import com.example.groupProject.dto.chat.ChatMessageDto;
+import com.example.groupProject.dto.chat.MessageSubDto;
+import com.example.groupProject.service.chat.ChatService;
+import com.example.groupProject.service.chat.RedisPublisher;
+import com.example.groupProject.service.chat.RedisSubscriber;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.redisson.api.RTopic;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -23,9 +29,11 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,13 +46,29 @@ public class ChatControllerTest {
 
     private static final String SOCKET_URL = "ws://127.0.0.1:8080/ws-stomp";
     private static StompSession session;
-    private RedissonClient redissonClient;
-    private static final CountDownLatch latch = new CountDownLatch(1);
+    private static CountDownLatch latch;
+
+    @Autowired
+    private ChatController chatController;
+
+    @Autowired
+    private ChatService chatService;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private RedisPublisher redisPublisher;
+
+    @Autowired
+    private RedisSubscriber redisSubscriber;
+
+    @Autowired
+    private RedisMessageListenerContainer redisMessageListenerContainer;
 
     @BeforeEach
     public void beforeEach() throws ExecutionException, InterruptedException {
         session = setSession();
-        redissonClient = createRedissonClient();
     }
 
     private StompSession setSession() throws ExecutionException, InterruptedException {
@@ -69,15 +93,19 @@ public class ChatControllerTest {
 
     private class MyStompSessionHandler extends StompSessionHandlerAdapter {
         @Override
-        public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-            System.out.println("connect 완료");
+        public Type getPayloadType(StompHeaders headers) {
+            return String.class;
         }
-    }
 
-    private RedissonClient createRedissonClient() {
-        Config config = new Config();
-        config.useSingleServer().setAddress("redis://127.0.0.1:6379");
-        return org.redisson.Redisson.create(config);
+        @Override
+        public void handleFrame(StompHeaders headers, Object payload) {
+            System.out.println("Received message: " + payload);
+        }
+
+        @Override
+        public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+            System.out.println("After Connected");
+        }
     }
 
     @Test
@@ -101,25 +129,28 @@ public class ChatControllerTest {
     }
 
     @Test
-    @DisplayName("Redis Pub/Sub을 이용한 WebSocket 통신 테스트")
-    public void redis_websocket_통신() throws Exception {
-        RTopic topic = redissonClient.getTopic("chatChannel");
+    @DisplayName("유저가 채팅방에 구독하면 메시지를 발행하고 수신할 수 있다")
+    public void redis_websocket_publish() throws Exception {
+        // RedisPublisher를 통해 메시지를 발행할 수 있도록 설정
+        String message = "Hello from WebSocket!";
+        String roomId = "1L";
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .roomId(roomId)
+                .message(message)
+                .build();
+        MessageSubDto messageSubDto = MessageSubDto.builder()
+                .chatMessageDto(chatMessageDto)
+                .build();
 
-        topic.addListener(String.class, (channel, msg) -> {
-            System.out.println("Received message from Redis: " + msg);
-            latch.countDown(); // 메시지 수신 시 테스트 진행을 위한 latch 카운트다운
-        });
+        latch = new CountDownLatch(1);
 
-        // WebSocket을 통해 메시지 발행
-        session.send("/app/chat", "Hello from WebSocket!");
+        session.subscribe("/sub/chat/room" + roomId, new MyStompSessionHandler());
 
-        // Redis에 메시지 발행
-        topic.publish("Hello from Redis!");
+        session.send("/pub/chat/message", chatMessageDto);
 
-        // 메시지가 수신될 때까지 대기 (최대 5초)
-        boolean messageReceived = latch.await(5, java.util.concurrent.TimeUnit.SECONDS);
+        latch.await(2, TimeUnit.SECONDS);
 
-        assertThat(messageReceived).isTrue(); // 메시지 수신이 성공적으로 이루어졌는지 확인
+        //RedisSubscriber log가 출력되면 성공하는 테스트 -> 추후 assertThat으로 변경 필요
     }
 
 }

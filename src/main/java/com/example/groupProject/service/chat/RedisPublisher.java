@@ -21,7 +21,7 @@ public class RedisPublisher {
      * Object publish
      */
     public void publish(MessageSubDto message) {
-        log.info("RedisPublisher - topic ::: " + topic.getTopic() + ", message(Object) ::: ", message);
+        log.info("RedisPublisher - topic ::: {}, message(Object) ::: {} ", topic.getTopic(), message);
         template.convertAndSend(topic.getTopic(), message);
     }
 
