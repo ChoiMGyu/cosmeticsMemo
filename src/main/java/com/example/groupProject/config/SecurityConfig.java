@@ -77,14 +77,13 @@ public class SecurityConfig {
                 "/login", "/", "/join", "/api/user/new",
                 "/alarm", "/send", "/reissue",
                 "/test/not", "/test/user",
-                "/api/boards/board/{boardId}/comments",
                 "/ws-stomp/**"
         };
     }
 
     private static String[] getPublicGetUrls() {
         return new String[]{
-                "/api/boards/board/**"
+                "/api/boards/board/**", "/stomp-test"
         };
     }
 
