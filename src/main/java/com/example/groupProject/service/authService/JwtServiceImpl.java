@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
-    private static final Long ACCESS_TOKEN_TIME = 600000000L;
+    private static final Long ACCESS_TOKEN_TIME = 6000000000000L;
     private static final Long REFRESH_TOKEN_TIME = 86400000L;
 
     private static final String REFRESH_TOKEN_NULL_MESSAGE = "Refresh token is null";

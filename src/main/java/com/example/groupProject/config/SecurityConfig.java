@@ -77,7 +77,7 @@ public class SecurityConfig {
                 "/login", "/", "/join", "/api/user/new",
                 "/alarm", "/send", "/reissue",
                 "/test/not", "/test/user",
-                "/ws-stomp/**"
+                "/ws-stomp", "/ws-stomp/**"
         };
     }
 

@@ -1,7 +1,9 @@
 package com.example.groupProject.service.chat;
 
+import com.example.groupProject.domain.chat.ChatMessage;
 import com.example.groupProject.dto.chat.ChatMessageDto;
 import com.example.groupProject.dto.chat.MessageSubDto;
+import com.example.groupProject.mongo.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,48 +14,89 @@ import org.springframework.stereotype.Service;
 public class ChatService {
 
     private final RedisPublisher redisPublisher;
+    private final ChatMessageRepository chatMessageRepository;
 
     /**
      * 채팅방에 메시지 발송
      */
-    public void sendChatMessage(ChatMessageDto chatMessage) {
-//        // 0. redis에 해당 채팅방roomId(key)에 마지막 메세지(value)를 넣어준다.
-//        chatRoomRedisRepository.setLastChatMessage(chatMessage.getRoomId(), chatMessage);
-//
-//        Long userId = chatMessage.getUserId();
-//        Long partnerId;
-//
-//        // 1. 채팅방이 삭제되는 것이라면 delete 를 해준다.
-//        if (chatMessage.getType().equals(MessageType.DELETE)) {
-//            chatRoomService.deleteChatRoom(accessToken, chatMessage.getRoomId(), userId);
-//            chatRoomRedisRepository.deleteChatRoom(userId,chatMessage.getRoomId());
-//        }
-//
-//        ChatRoomListGetResponse newChatRoomList = null;
-//        if (chatRoomRedisRepository.existChatRoom(userId, chatMessage.getRoomId())) {
-//            newChatRoomList = chatRoomRedisRepository.getChatRoom(userId, chatMessage.getRoomId());
-//        } else {
-//            newChatRoomList = chatRoomService.getChatRoomInfo(accessToken, chatMessage.getRoomId());
-//        }
-//
-//        partnerId = getPartnerId(chatMessage, newChatRoomList);
-//
-//        // 2. 채팅방 리스트에 새로운 채팅방 정보가 없다면, 넣어준다. 마지막 메시지도 같이 담는다. 상대방 레디스에도 업데이트 해준다.
-//        setNewChatRoomInfo(chatMessage, newChatRoomList);
-//
-//        // 3. 마지막 메시지들이 담긴 채팅방 리스트들을 가져온다.
-//        List<ChatRoomListGetResponse> chatRoomListGetResponseList = chatRoomService.getChatRoomList(userId, accessToken);
-//        // 4. 파트너 채팅방 리스트도 가져온다. (파트너는 userId 로만)
-//        List<ChatRoomListGetResponse> partnerChatRoomGetResponseList = getChatRoomListByUserId(partnerId);
-//
-//        // 5. 마지막 메세지 기준으로 정렬 채팅방 리스트 정렬
-//        chatRoomListGetResponseList = chatRoomService.sortChatRoomListLatest(chatRoomListGetResponseList);
-//        partnerChatRoomGetResponseList = chatRoomService.sortChatRoomListLatest(partnerChatRoomGetResponseList);
+    public void sendChatMessage(ChatMessageDto chatMessageDto) {
+        //채팅방을 생성한다 (ENTER) -> 특정 채널의 roomId를 구독한다
+        switch (chatMessageDto.getType()) {
+            case ENTER:
+                handleEnter(chatMessageDto);
+                break;
+            case TALK:
+                handleTalk(chatMessageDto);
+                break;
+            default:
+                log.warn("Unknown Message Type : {}", chatMessageDto.getType());
+        }
+
+        //채팅방에서 대화를 시도한다 (TALK)
+
+        //채팅방에서 나가려고 한다 (QUIT)
+
+        //채팅방을 삭제하려고 한다 (DELETE)
+    }
+
+    /**
+     * 채팅방 입장 처리
+     */
+    private void handleEnter(ChatMessageDto chatMessageDto) {
+        // 입장 시 userCount 증가
+        chatMessageDto.setUserCount(chatMessageDto.getUserCount() + 1);
+
+        // 메시지 내용 설정
+        chatMessageDto.setMessage(chatMessageDto.getUserId() + "님이 채팅방에 입장했습니다.");
 
         MessageSubDto messageSubDto = MessageSubDto.builder()
-                .chatMessageDto(chatMessage)
+                .userId(chatMessageDto.getUserId())
+                .chatMessageDto(chatMessageDto)
+                .build();
+
+        //ChatMessage를 생성하여 mongoDB에 저장한다
+
+        // Redis를 통해 입장 메시지 발행
+        redisPublisher.publish(messageSubDto);
+
+        log.info("handleEnter - User {} entered room {}", chatMessageDto.getUserId(), chatMessageDto.getRoomId());
+    }
+
+    /**
+     * 채팅방에서 대화 시 처리
+     */
+    private void handleTalk(ChatMessageDto chatMessageDto) {
+        // 대화 메시지를 Redis에 발행
+        MessageSubDto messageSubDto = MessageSubDto.builder()
+                .userId(chatMessageDto.getUserId())
+                .chatMessageDto(chatMessageDto)
                 .build();
 
         redisPublisher.publish(messageSubDto);
+        log.info("handleTalk - User {} sent message to room {}: {}", chatMessageDto.getUserId(), chatMessageDto.getRoomId(), chatMessageDto.getMessage());
+    }
+
+    /**
+     * 채팅방에서 퇴장 처리 -> 구독 해제가 필요하지 않을까?
+     */
+    private void handleQuit(ChatMessageDto chatMessageDto) {
+        chatMessageDto.setUserCount(chatMessageDto.getUserCount() - 1);
+        chatMessageDto.setMessage(chatMessageDto.getUserId() + "님이 채팅방에서 나갔습니다.");
+
+        MessageSubDto messageSubDto = MessageSubDto.builder()
+                .userId(chatMessageDto.getUserId())
+                .chatMessageDto(chatMessageDto)
+                .build();
+
+        redisPublisher.publish(messageSubDto);
+
+        log.info("handleQuit - User {} left room {}", chatMessageDto.getUserId(), chatMessageDto.getRoomId());
+    }
+
+    /**
+     * 채팅방 삭제 처리 -> 구독 해제가 필요하지 않을까?
+     */
+    private void handleDelete(ChatMessageDto chatMessageDto) {
+        log.info("Message deleted in room {}", chatMessageDto.getRoomId());
     }
 }

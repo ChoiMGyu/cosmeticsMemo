@@ -48,24 +48,6 @@ public class ChatControllerTest {
     private static StompSession session;
     private static CountDownLatch latch;
 
-    @Autowired
-    private ChatController chatController;
-
-    @Autowired
-    private ChatService chatService;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    private RedisPublisher redisPublisher;
-
-    @Autowired
-    private RedisSubscriber redisSubscriber;
-
-    @Autowired
-    private RedisMessageListenerContainer redisMessageListenerContainer;
-
     @BeforeEach
     public void beforeEach() throws ExecutionException, InterruptedException {
         session = setSession();

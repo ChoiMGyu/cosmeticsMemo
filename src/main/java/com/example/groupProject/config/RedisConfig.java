@@ -28,7 +28,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public ChannelTopic channelTopic() {
+    public ChannelTopic chatRoomTopic() {
         return new ChannelTopic("chatroom");
     }
 
@@ -52,20 +52,20 @@ public class RedisConfig {
      */
     @Bean
     public RedisMessageListenerContainer redisMessageListener(
-            MessageListenerAdapter listenerAdapterChatMessage,
-            ChannelTopic channelTopic
+            MessageListenerAdapter chatRoomListenerAdapter,
+            ChannelTopic topic
     ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory());
-        container.addMessageListener(listenerAdapterChatMessage, channelTopic);
+        container.addMessageListener(chatRoomListenerAdapter, topic);
         return container;
     }
 
     /**
-     * 실제 메시지를 처리하는 subscriber 설정 추가
+     * Redis에 발행되는 실제 메시지(채팅방 생성)를 처리하는 subscriber 설정 추가
      */
     @Bean
-    public MessageListenerAdapter listenerAdapterChatMessage(RedisSubscriber subscriber) {
+    public MessageListenerAdapter chatRoomListenerAdapter(RedisSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber, "sendMessage");
     }
 }

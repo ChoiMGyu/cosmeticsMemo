@@ -1,21 +1,28 @@
 package com.example.groupProject.controller.chat;
 
 import com.example.groupProject.dto.chat.ChatMessageDto;
+import com.example.groupProject.service.chat.ChatMongoService;
 import com.example.groupProject.service.chat.ChatService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@Slf4j
+@RestController
 @RequiredArgsConstructor
 public class ChatController {
 
-    //private final ChatMongoService chatMongoService;
+    private final ChatMongoService chatMongoService;
     private final ChatService chatService;
 
     @MessageMapping("/chat/message")
     public void message(ChatMessageDto chatMessageDto) {
-        //mongoDB에 채팅방 저장 save
+
+        //log.info("ChatController에서 사용자로부터 가져온 AccessToken ::: " + accessToken);
+
+        chatMongoService.saveMessage(chatMessageDto);
         chatService.sendChatMessage(chatMessageDto);
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RedisPublisher {
 
-    private final ChannelTopic topic;
+    private final ChannelTopic channelTopic;
     private final RedisTemplate<String, Object> template;
 
     /** publish를 호출하면, topic을 구독하는 모든 구독자에게 message가 발행 (pub) */
@@ -21,15 +21,15 @@ public class RedisPublisher {
      * Object publish
      */
     public void publish(MessageSubDto message) {
-        log.info("RedisPublisher - topic ::: {}, message(Object) ::: {} ", topic.getTopic(), message);
-        template.convertAndSend(topic.getTopic(), message);
+        log.info("RedisPublisher - channelTopic ::: {}, message(Object) ::: {} ", channelTopic.getTopic(), message);
+        template.convertAndSend(channelTopic.getTopic(), message);
     }
 
     /**
      * String publish
      */
     public void publish(String data) {
-        log.info("RedisPublisher - topic ::: " + topic.getTopic() + ", message(String) ::: ", data);
-        template.convertAndSend(topic.getTopic(), data);
+        log.info("RedisPublisher - channelTopic ::: " + channelTopic.getTopic() + ", message(String) ::: ", data);
+        template.convertAndSend(channelTopic.getTopic(), data);
     }
 }
