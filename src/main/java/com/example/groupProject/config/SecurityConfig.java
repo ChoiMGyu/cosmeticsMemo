@@ -83,7 +83,7 @@ public class SecurityConfig {
 
     private static String[] getPublicGetUrls() {
         return new String[]{
-                "/api/boards/board/**", "/stomp-test"
+                "/api/boards/board/**", "/stomp-test", "/login"
         };
     }
 

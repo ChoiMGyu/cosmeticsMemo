@@ -1,5 +1,6 @@
 package com.example.groupProject.service.chat;
 
+import com.example.groupProject.config.util.JWTUtil;
 import com.example.groupProject.domain.chat.ChatRoom;
 import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.chat.ChatMessageDto;
@@ -20,6 +21,7 @@ public class ChatService {
     private static final String NOT_EXIST_USER = "존재하지 않는 회원입니다.";
     private static final String NOT_EXIST_CHATROOM = "존재하지 않는 채팅방입니다.";
 
+    private final JWTUtil jwtUtil;
     private final RedisPublisher redisPublisher;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -27,16 +29,16 @@ public class ChatService {
     /**
      * 채팅방에 메시지 발송
      */
-    public void sendChatMessage(ChatMessageDto chatMessageDto) {
+    public void sendChatMessage(ChatMessageDto chatMessageDto, String accessToken) {
         switch (chatMessageDto.getType()) {
             case ENTER:
-                handleEnter(chatMessageDto);
+                handleEnter(chatMessageDto, accessToken);
                 break;
             case TALK:
-                handleTalk(chatMessageDto);
+                handleTalk(chatMessageDto, accessToken);
                 break;
             case QUIT:
-                handleQuit(chatMessageDto);
+                handleQuit(chatMessageDto, accessToken);
             default:
                 log.warn("Unknown Message Type : {}", chatMessageDto.getType());
         }
@@ -45,17 +47,16 @@ public class ChatService {
     /**
      * 채팅방 입장 처리
      */
-    private void handleEnter(ChatMessageDto chatMessageDto) {
+    private void handleEnter(ChatMessageDto chatMessageDto, String accessToken) {
         //MessageType이 ENTER일 때
 
         //roomId를 클라이언트로부터 전달받음 (roomId 방에 속한 subscriber에게 메시지를 전달)
 
         //userId는 publisher로 누가 방을 만들었는지 출력하기 위해 User의 이름을 찾아야 함
-        User user = userRepository.findById(chatMessageDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_USER));
+        String account = jwtUtil.getAccount(accessToken);
 
         //message의 경우, 채팅방에 입장하였다는 걸 알려주어야 한다
-        chatMessageDto.setMessage(user.getAccount() + "님이 채팅방에 입장하였습니다.");
+        chatMessageDto.setMessage(account + "님이 채팅방에 입장하였습니다.");
 
         //time의 경우, 현재 메시지를 작성한 시간을 설정한다
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -85,7 +86,7 @@ public class ChatService {
     /**
      * 채팅방에서 대화 시 처리
      */
-    private void handleTalk(ChatMessageDto chatMessageDto) {
+    private void handleTalk(ChatMessageDto chatMessageDto, String accessToken) {
         //MessageType이 TALK일 때
 
         //roomId에 해당하는 채팅방에 속한 인원들과 대화를 시도한다
@@ -94,11 +95,10 @@ public class ChatService {
         chatMessageDto.setRoomId(chatMessageDto.getRoomId());
 
         //userId는 대화를 보낸 (publish) 사람의 이름이어야 한다
-        User user = userRepository.findById(chatMessageDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_USER));
+        String account = jwtUtil.getAccount(accessToken);
 
         //message는 user가 입력한 메시지를 그대로 전달한다
-        chatMessageDto.setMessage(user.getAccount() + " : " + chatMessageDto.getMessage());
+        chatMessageDto.setMessage(account + " : " + chatMessageDto.getMessage());
 
         //time은 현재 시간으로 설정한다
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -121,17 +121,16 @@ public class ChatService {
      * 채팅방에서 퇴장 처리
      * 구독 해제는 클라이언트 측 (프론트) 에서 이루어진다
      */
-    private void handleQuit(ChatMessageDto chatMessageDto) {
+    private void handleQuit(ChatMessageDto chatMessageDto, String accessToken) {
         //MessageType이 QUIT일 때
 
         //roomId에 속한 인원들에게 퇴장 메시지를 전송한다
 
         //userId를 가진 인원이 메시지를 전송해야 한다
-        User user = userRepository.findById(chatMessageDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_USER));
+        String account = jwtUtil.getAccount(accessToken);
 
         //message로 퇴장 멘트를 작성한다
-        chatMessageDto.setMessage(user.getAccount() + "님이 채팅방에서 나갔습니다.");
+        chatMessageDto.setMessage(account + "님이 채팅방에서 나갔습니다.");
 
         //time은 현재 시간으로 설정한다
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");

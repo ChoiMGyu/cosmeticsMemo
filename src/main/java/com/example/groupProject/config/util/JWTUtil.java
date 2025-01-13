@@ -1,7 +1,9 @@
 package com.example.groupProject.config.util;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -11,6 +13,8 @@ import java.util.Date;
 
 @Component
 public class JWTUtil {
+    private static final String JWT_EXPIRED_MESSAGE = "만료된 JWT 토큰입니다.";
+    private static final int BEARER_EXCLUDE_IDX = 7;
 
     private final SecretKey secretKey;
 
@@ -32,7 +36,8 @@ public class JWTUtil {
     }
 
     public Boolean isExpired(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+        boolean result = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+        return result;
     }
 
     //발급
@@ -46,5 +51,21 @@ public class JWTUtil {
                 .signWith(secretKey)
                 .compact();
         return token;
+    }
+
+    public String extractJwt(final StompHeaderAccessor accessor) {
+        String authorization = accessor.getFirstNativeHeader("Authorization");
+        if(authorization != null && authorization.startsWith("Bearer ")) {
+            return authorization.substring(BEARER_EXCLUDE_IDX);
+        }
+        return authorization;
+    }
+
+    public void validateToken(final String authorization) {
+        try {
+            isExpired(authorization);
+        } catch (ExpiredJwtException e) {
+            throw new RuntimeException(JWT_EXPIRED_MESSAGE);
+        }
     }
 }
