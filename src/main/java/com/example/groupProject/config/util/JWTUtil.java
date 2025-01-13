@@ -1,5 +1,6 @@
 package com.example.groupProject.config.util;
 
+import com.example.groupProject.config.websocket.UnauthorizedException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,8 @@ import java.util.Date;
 @Component
 public class JWTUtil {
     private static final String JWT_EXPIRED_MESSAGE = "만료된 JWT 토큰입니다.";
-    private static final int BEARER_EXCLUDE_IDX = 7;
+    private static final String BEARER_PREFIX = "Bearer ";
+    private static final String AUTHORIZATION_PREFIX = "Authorization";
 
     private final SecretKey secretKey;
 
@@ -54,9 +56,9 @@ public class JWTUtil {
     }
 
     public String extractJwt(final StompHeaderAccessor accessor) {
-        String authorization = accessor.getFirstNativeHeader("Authorization");
-        if(authorization != null && authorization.startsWith("Bearer ")) {
-            return authorization.substring(BEARER_EXCLUDE_IDX);
+        String authorization = accessor.getFirstNativeHeader(AUTHORIZATION_PREFIX);
+        if (authorization != null && authorization.startsWith(BEARER_PREFIX)) {
+            return authorization.substring(BEARER_PREFIX.length());
         }
         return authorization;
     }
@@ -65,7 +67,7 @@ public class JWTUtil {
         try {
             isExpired(authorization);
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException(JWT_EXPIRED_MESSAGE);
+            throw new UnauthorizedException(JWT_EXPIRED_MESSAGE);
         }
     }
 }

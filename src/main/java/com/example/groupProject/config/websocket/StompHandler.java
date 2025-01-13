@@ -1,4 +1,4 @@
-package com.example.groupProject.config;
+package com.example.groupProject.config.websocket;
 
 import com.example.groupProject.config.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +24,12 @@ public class StompHandler implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
-        if(StompCommand.CONNECT == accessor.getCommand()) {
+        if (StompCommand.CONNECT == accessor.getCommand()) {
             final String authorization = jwtUtil.extractJwt(accessor);
 
             jwtUtil.validateToken(authorization);
 
-            if(accessor.getSessionAttributes() == null) {
+            if (accessor.getSessionAttributes() == null) {
                 accessor.setSessionAttributes(new HashMap<>());
             }
 

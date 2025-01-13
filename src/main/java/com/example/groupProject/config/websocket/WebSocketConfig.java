@@ -1,4 +1,4 @@
-package com.example.groupProject.config;
+package com.example.groupProject.config.websocket;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +15,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
+    private final StompExceptionHandler stompExceptionHandler;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -24,11 +25,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-stomp")
+        registry.setErrorHandler(stompExceptionHandler)
+                .addEndpoint("/ws-stomp")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor())
                 .withSockJS();
-        registry.addEndpoint("/ws-stomp")
+        registry.setErrorHandler(stompExceptionHandler)
+                .addEndpoint("/ws-stomp")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor());
     }
