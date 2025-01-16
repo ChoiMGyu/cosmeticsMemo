@@ -46,6 +46,7 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework:spring-messaging'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
 
 
 	implementation 'org.springframework.boot:spring-boot-starter-security'
