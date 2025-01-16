@@ -37,6 +37,7 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	implementation 'org.springframework.kafka:spring-kafka'
 
 	runtimeOnly 'com.mysql:mysql-connector-j' //개발 환경에서 사용할 DB(MySQL)
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

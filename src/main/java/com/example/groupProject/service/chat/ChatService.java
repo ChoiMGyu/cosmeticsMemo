@@ -2,11 +2,9 @@ package com.example.groupProject.service.chat;
 
 import com.example.groupProject.config.util.JWTUtil;
 import com.example.groupProject.domain.chat.ChatRoom;
-import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.chat.ChatMessageDto;
 import com.example.groupProject.dto.chat.MessageSubDto;
 import com.example.groupProject.repository.chat.ChatRoomRepository;
-import com.example.groupProject.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,6 @@ public class ChatService {
 
     private final JWTUtil jwtUtil;
     private final RedisPublisher redisPublisher;
-    private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
 
     /**
@@ -67,6 +64,7 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(Long.parseLong(chatMessageDto.getRoomId()))
                 .orElseGet(() -> {
                     ChatRoom newChatRoom = ChatRoom.builder()
+                            .roomLeaderId(chatMessageDto.getUserId())
                             .userCount(0)
                             .build();
                     return chatRoomRepository.save(newChatRoom);

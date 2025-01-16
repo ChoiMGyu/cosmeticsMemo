@@ -1,7 +1,6 @@
 package com.example.groupProject.controller;
 
 import com.example.groupProject.config.util.JWTUtil;
-import com.example.groupProject.config.websocket.UnauthorizedException;
 import com.example.groupProject.dto.chat.ChatMessageDto;
 import com.example.groupProject.dto.chat.MessageSubDto;
 import org.junit.jupiter.api.BeforeEach;
