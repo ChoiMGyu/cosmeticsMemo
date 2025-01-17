@@ -18,6 +18,7 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String roomName; //채팅방 이름
     private Long roomLeaderId; //채팅방 방장
     private long userCount; //채팅방 인원수
 
