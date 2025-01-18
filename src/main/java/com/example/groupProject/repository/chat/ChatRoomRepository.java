@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-    Optional<ChatRoom> findChatRoomByName(String name);
+    Optional<ChatRoom> findChatRoomByRoomName(String roomName);
 
-    @Query("SELECT new com.example.groupProject.dto.chat.ChatRoomDto(c.roomName, u.name, c.userCount) " +
+    @Query("SELECT new com.example.groupProject.dto.chat.ChatRoomDto(c.roomName, u.account, c.userCount) " +
             "FROM ChatRoom c " +
             "JOIN User u ON u.id = c.roomLeaderId")
     List<ChatRoomDto> findAllChatRoomWithLeaderName();

@@ -41,7 +41,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             throw new IllegalArgumentException(NOT_EXIST_USER);
         }
 
-        chatRoomRepository.findChatRoomByName(roomName)
+        chatRoomRepository.findChatRoomByRoomName(roomName)
                 .ifPresent(chatRoom -> {
                     throw new IllegalArgumentException(EXIST_CHATROOM_NAME);
                 });
