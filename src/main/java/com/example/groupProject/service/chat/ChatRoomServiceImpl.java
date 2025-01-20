@@ -10,6 +10,7 @@ import com.example.groupProject.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -18,10 +19,15 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ChatRoomServiceImpl implements ChatRoomService {
     private static final String NOT_EXIST_USER = "로그인 후 진행해 주세요.";
     private static final String EXIST_CHATROOM_NAME = "중복된 채팅방 이름입니다.";
     private static final String CREATE_CHATROOM_MESSAGE = "채팅방을 개설하였습니다.";
+    private static final String NOT_EXIST_CHAT_ROOM = "채팅방이 존재하지 않습니다.";
+    private static final String DELETE_CHATROOM_MESSAGE = "채팅방이 삭제되었습니다.";
+    private static final String UPDATE_CHATROOM_NAME_MESSAGE = "채팅방 이름이 변경되었습니다.";
+    private static final String NOT_ROOM_LEADER_ERROR = "채팅방의 방장이 아닙니다.";
 
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
@@ -35,6 +41,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
+    @Transactional
     public Long createChatRoom(String roomLeader, String roomName) {
         List<User> user = userRepository.findByAccount(roomLeader);
         if (user.isEmpty()) {
@@ -69,5 +76,67 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         kafkaProducerService.sendMessage(chatMessageDto);
 
         return chatRoom.getId();
+    }
+
+    @Override
+    @Transactional
+    public void deleteChatRoom(Long id, String roomLeader) {
+        List<User> user = userRepository.findByAccount(roomLeader);
+        if (user.isEmpty()) {
+            throw new IllegalArgumentException(NOT_EXIST_USER);
+        }
+
+        ChatRoom chatRoom = chatRoomRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_CHAT_ROOM));
+
+        if(!chatRoom.getRoomLeaderId().equals(user.getFirst().getId())) {
+            throw new IllegalArgumentException(NOT_ROOM_LEADER_ERROR);
+        }
+
+        chatRoomRepository.delete(chatRoom);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String formattedTime = LocalTime.now().format(formatter);
+
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .roomId(Long.toString(chatRoom.getId()))
+                .userId(user.getLast().getId())
+                .message(DELETE_CHATROOM_MESSAGE)
+                .time(formattedTime)
+                .userCount(0)
+                .build();
+
+        kafkaProducerService.sendMessage(chatMessageDto);
+    }
+
+    @Override
+    @Transactional
+    public void updateChatRoomName(Long id, String roomLeader, String newChatRoomName) {
+        List<User> user = userRepository.findByAccount(roomLeader);
+        if (user.isEmpty()) {
+            throw new IllegalArgumentException(NOT_EXIST_USER);
+        }
+
+        ChatRoom chatRoom = chatRoomRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_CHAT_ROOM));
+
+        if(!chatRoom.getRoomLeaderId().equals(user.getFirst().getId())) {
+            throw new IllegalArgumentException(NOT_ROOM_LEADER_ERROR);
+        }
+
+        chatRoom.changeRoomName(newChatRoomName);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String formattedTime = LocalTime.now().format(formatter);
+
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .roomId(Long.toString(chatRoom.getId()))
+                .userId(user.getLast().getId())
+                .message(UPDATE_CHATROOM_NAME_MESSAGE)
+                .time(formattedTime)
+                .userCount(chatRoom.getUserCount())
+                .build();
+
+        kafkaProducerService.sendMessage(chatMessageDto);
     }
 }

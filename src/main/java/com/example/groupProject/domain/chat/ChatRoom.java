@@ -29,4 +29,8 @@ public class ChatRoom {
     public void quitRoom() {
         this.userCount -= USER_PER_COUNT;
     }
+
+    public void changeRoomName(String roomName) {
+        this.roomName = roomName;
+    }
 }

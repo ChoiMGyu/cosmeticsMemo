@@ -10,6 +10,8 @@ import com.example.groupProject.repository.chat.ChatRoomRepository;
 import com.example.groupProject.repository.user.UserRepository;
 import com.example.groupProject.service.chat.ChatRoomService;
 import com.example.groupProject.service.chat.KafkaProducerService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -42,6 +45,9 @@ import static org.mockito.Mockito.verify;
         },
         ports = {9092})
 public class ChatRoomServiceTest {
+
+    @PersistenceContext
+    private EntityManager em;
 
     @Autowired
     private ChatRoomService chatRoomService;
@@ -66,6 +72,7 @@ public class ChatRoomServiceTest {
     @AfterEach
     public void setAfterEach() {
         userRepository.deleteAll();
+        chatRoomRepository.deleteAll();
     }
 
     @Test
@@ -150,15 +157,23 @@ public class ChatRoomServiceTest {
         Long id = chatRoom.getId();
 
         //when
-        chatRoomService.deleteChatRoom(chatRoom.getRoomName(), user.getAccount());
+        chatRoomService.deleteChatRoom(chatRoom.getId(), user.getAccount());
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .roomId(Long.toString(id))
+                .userId(user.getId())
+                .message("채팅방이 삭제되었습니다.")
+                .time(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
+                .userCount(0)
+                .build();
 
         //then
         assertThat(chatRoomRepository.findById(id).isPresent()).isFalse();
-        verify(kafkaProducerService, times(1)).sendMessage(new ChatMessageDto());
+        verify(kafkaProducerService, times(1)).sendMessage(chatMessageDto);
     }
 
     @Test
     @DisplayName("채팅방 이름을 수정할 수 있다")
+    @Transactional
     public void 채팅방_이름_수정() throws Exception {
         //given
         String newChatRoomName = "새로운 채팅방 이름";
@@ -171,10 +186,22 @@ public class ChatRoomServiceTest {
         chatRoomRepository.save(chatRoom);
 
         //when
-        chatRoomService.updateChatRoomName(chatRoom.getRoomName(), user.getAccount(), newChatRoomName);
+        chatRoomService.updateChatRoomName(chatRoom.getId(), user.getAccount(), newChatRoomName);
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .roomId(Long.toString(chatRoom.getId()))
+                .userId(user.getId())
+                .message("채팅방 이름이 변경되었습니다.")
+                .time(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
+                .userCount(chatRoom.getUserCount())
+                .build();
+
+        // Entity 작업
+        em.flush();
+        em.clear();
 
         //then
         assertThat(chatRoom.getRoomName()).isEqualTo(newChatRoomName);
+        verify(kafkaProducerService, times(1)).sendMessage(chatMessageDto);
     }
 
 }
