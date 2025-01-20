@@ -1,6 +1,7 @@
 package com.example.groupProject.service.chat;
 
 import com.example.groupProject.dto.chat.ChatRoomAllDto;
+import com.example.groupProject.dto.chat.ChatRoomUpdateDto;
 
 public interface ChatRoomService {
 
@@ -10,5 +11,5 @@ public interface ChatRoomService {
 
     void deleteChatRoom(Long id, String roomLeader);
 
-    void updateChatRoomName(Long id, String roomLeader, String newChatRoomName);
+    void updateChatRoomName(ChatRoomUpdateDto chatRoomUpdateDto);
 }

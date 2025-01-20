@@ -1,6 +1,5 @@
 package com.example.groupProject.dto.chat;
 
-import com.example.groupProject.domain.chat.ChatRoom;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

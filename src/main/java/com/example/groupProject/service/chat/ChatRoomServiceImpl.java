@@ -5,6 +5,7 @@ import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.chat.ChatMessageDto;
 import com.example.groupProject.dto.chat.ChatRoomAllDto;
 import com.example.groupProject.dto.chat.ChatRoomDto;
+import com.example.groupProject.dto.chat.ChatRoomUpdateDto;
 import com.example.groupProject.repository.chat.ChatRoomRepository;
 import com.example.groupProject.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -111,20 +112,20 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     @Transactional
-    public void updateChatRoomName(Long id, String roomLeader, String newChatRoomName) {
-        List<User> user = userRepository.findByAccount(roomLeader);
+    public void updateChatRoomName(ChatRoomUpdateDto chatRoomUpdateDto) {
+        List<User> user = userRepository.findByAccount(chatRoomUpdateDto.getRoomLeader());
         if (user.isEmpty()) {
             throw new IllegalArgumentException(NOT_EXIST_USER);
         }
 
-        ChatRoom chatRoom = chatRoomRepository.findById(id)
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomUpdateDto.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_CHAT_ROOM));
 
         if(!chatRoom.getRoomLeaderId().equals(user.getFirst().getId())) {
             throw new IllegalArgumentException(NOT_ROOM_LEADER_ERROR);
         }
 
-        chatRoom.changeRoomName(newChatRoomName);
+        chatRoom.changeRoomName(chatRoomUpdateDto.getNewChatRoomName());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = LocalTime.now().format(formatter);
