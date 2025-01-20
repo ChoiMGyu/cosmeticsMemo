@@ -56,6 +56,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = LocalTime.now().format(formatter);
 
+        chatRoomRepository.save(chatRoom);
+
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
                 .roomId(Long.toString(chatRoom.getId()))
                 .userId(user.getLast().getId())
@@ -65,8 +67,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .build();
 
         kafkaProducerService.sendMessage(chatMessageDto);
-
-        chatRoomRepository.save(chatRoom);
 
         return chatRoom.getId();
     }
