@@ -6,6 +6,7 @@ import com.example.groupProject.domain.user.User;
 import com.example.groupProject.dto.chat.ChatMessageDto;
 import com.example.groupProject.dto.chat.ChatRoomAllDto;
 import com.example.groupProject.dto.chat.ChatRoomDto;
+import com.example.groupProject.dto.chat.ChatRoomUpdateDto;
 import com.example.groupProject.repository.chat.ChatRoomRepository;
 import com.example.groupProject.repository.user.UserRepository;
 import com.example.groupProject.service.chat.ChatRoomService;
@@ -186,7 +187,12 @@ public class ChatRoomServiceTest {
         chatRoomRepository.save(chatRoom);
 
         //when
-        chatRoomService.updateChatRoomName(chatRoom.getId(), user.getAccount(), newChatRoomName);
+        ChatRoomUpdateDto chatRoomUpdateDto = ChatRoomUpdateDto.builder()
+                .roomId(chatRoom.getId())
+                .roomLeader(user.getAccount())
+                .newChatRoomName(newChatRoomName)
+                .build();
+        chatRoomService.updateChatRoomName(chatRoomUpdateDto);
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
                 .roomId(Long.toString(chatRoom.getId()))
                 .userId(user.getId())
