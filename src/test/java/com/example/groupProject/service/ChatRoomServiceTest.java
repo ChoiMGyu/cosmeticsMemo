@@ -136,4 +136,45 @@ public class ChatRoomServiceTest {
         assertThat(chatRoom2.getRoomLeaderId()).isEqualTo(user1.getId());
     }
 
+    @Test
+    @DisplayName("채팅방을 삭제할 수 있다")
+    public void 채팅방_삭제() throws Exception {
+        //given
+        ChatRoom chatRoom = ChatRoom.builder()
+                .roomName("채팅방 이름")
+                .roomLeaderId(user.getId())
+                .userCount(2)
+                .build();
+
+        chatRoomRepository.save(chatRoom);
+        Long id = chatRoom.getId();
+
+        //when
+        chatRoomService.deleteChatRoom(chatRoom.getRoomName(), user.getAccount());
+
+        //then
+        assertThat(chatRoomRepository.findById(id).isPresent()).isFalse();
+        verify(kafkaProducerService, times(1)).sendMessage(new ChatMessageDto());
+    }
+
+    @Test
+    @DisplayName("채팅방 이름을 수정할 수 있다")
+    public void 채팅방_이름_수정() throws Exception {
+        //given
+        String newChatRoomName = "새로운 채팅방 이름";
+        ChatRoom chatRoom = ChatRoom.builder()
+                .roomName("채팅방 이름")
+                .roomLeaderId(user.getId())
+                .userCount(2)
+                .build();
+
+        chatRoomRepository.save(chatRoom);
+
+        //when
+        chatRoomService.updateChatRoomName(chatRoom.getRoomName(), user.getAccount(), newChatRoomName);
+
+        //then
+        assertThat(chatRoom.getRoomName()).isEqualTo(newChatRoomName);
+    }
+
 }
