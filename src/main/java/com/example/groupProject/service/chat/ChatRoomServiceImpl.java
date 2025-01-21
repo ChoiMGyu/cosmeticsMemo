@@ -67,6 +67,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomRepository.save(chatRoom);
 
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .type(ChatMessageDto.MessageType.CREATE)
                 .roomId(Long.toString(chatRoom.getId()))
                 .userId(user.getLast().getId())
                 .message(CREATE_CHATROOM_MESSAGE)
@@ -74,7 +75,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .userCount(chatRoom.getUserCount())
                 .build();
 
-        kafkaProducerService.sendMessage(chatMessageDto);
+        kafkaProducerService.objectMapperMessage(chatMessageDto);
 
         return chatRoom.getId();
     }
@@ -90,7 +91,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_CHAT_ROOM));
 
-        if(!chatRoom.getRoomLeaderId().equals(user.getFirst().getId())) {
+        if (!chatRoom.getRoomLeaderId().equals(user.getFirst().getId())) {
             throw new IllegalArgumentException(NOT_ROOM_LEADER_ERROR);
         }
 
@@ -100,6 +101,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         String formattedTime = LocalTime.now().format(formatter);
 
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .type(ChatMessageDto.MessageType.DELETE)
                 .roomId(Long.toString(chatRoom.getId()))
                 .userId(user.getLast().getId())
                 .message(DELETE_CHATROOM_MESSAGE)
@@ -107,7 +109,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .userCount(0)
                 .build();
 
-        kafkaProducerService.sendMessage(chatMessageDto);
+        kafkaProducerService.objectMapperMessage(chatMessageDto);
     }
 
     @Override
@@ -121,7 +123,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomUpdateDto.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_CHAT_ROOM));
 
-        if(!chatRoom.getRoomLeaderId().equals(user.getFirst().getId())) {
+        if (!chatRoom.getRoomLeaderId().equals(user.getFirst().getId())) {
             throw new IllegalArgumentException(NOT_ROOM_LEADER_ERROR);
         }
 
@@ -131,6 +133,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         String formattedTime = LocalTime.now().format(formatter);
 
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .type(ChatMessageDto.MessageType.UPDATE_NAME)
                 .roomId(Long.toString(chatRoom.getId()))
                 .userId(user.getLast().getId())
                 .message(UPDATE_CHATROOM_NAME_MESSAGE)
@@ -138,6 +141,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .userCount(chatRoom.getUserCount())
                 .build();
 
-        kafkaProducerService.sendMessage(chatMessageDto);
+        kafkaProducerService.objectMapperMessage(chatMessageDto);
     }
 }

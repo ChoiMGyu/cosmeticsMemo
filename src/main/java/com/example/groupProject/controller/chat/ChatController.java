@@ -30,6 +30,6 @@ public class ChatController {
 
         chatMongoService.saveMessage(chatMessageDto);
         //chatService.sendChatMessage(chatMessageDto, accessToken);
-        kafkaProducerService.sendMessage(chatMessageDto);
+        kafkaProducerService.sendMessage(chatMessageDto, accessToken);
     }
 }

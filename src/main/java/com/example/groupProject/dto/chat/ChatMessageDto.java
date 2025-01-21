@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatMessageDto {
     public enum MessageType {
-        ENTER, TALK, QUIT, DELETE
+        ENTER, TALK, QUIT, DELETE, CREATE, UPDATE_NAME
     }
 
     private MessageType type;   // 메시지 타입 (ENTER, TALK, QUIT, DELETE)
