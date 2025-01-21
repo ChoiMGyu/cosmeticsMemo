@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -87,6 +88,7 @@ public class ChatRoomServiceTest {
         Long chatRoomId = chatRoomService.createChatRoom(roomLeader, roomName);
         Optional<ChatRoom> findChatRoom = chatRoomRepository.findChatRoomByRoomName(roomName);
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .type(ChatMessageDto.MessageType.CREATE)
                 .roomId(Long.toString(chatRoomId))
                 .userId(user.getId())
                 .message("채팅방을 개설하였습니다.")
@@ -96,7 +98,7 @@ public class ChatRoomServiceTest {
 
         //then
         assertThat(chatRoomId).isEqualTo(findChatRoom.get().getId());
-        verify(kafkaProducerService, times(1)).sendMessage(chatMessageDto);
+        verify(kafkaProducerService, times(1)).objectMapperMessage(eq(chatMessageDto));
     }
 
     @Test
@@ -160,6 +162,7 @@ public class ChatRoomServiceTest {
         //when
         chatRoomService.deleteChatRoom(chatRoom.getId(), user.getAccount());
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .type(ChatMessageDto.MessageType.DELETE)
                 .roomId(Long.toString(id))
                 .userId(user.getId())
                 .message("채팅방이 삭제되었습니다.")
@@ -169,7 +172,7 @@ public class ChatRoomServiceTest {
 
         //then
         assertThat(chatRoomRepository.findById(id).isPresent()).isFalse();
-        verify(kafkaProducerService, times(1)).sendMessage(chatMessageDto);
+        verify(kafkaProducerService, times(1)).objectMapperMessage(eq(chatMessageDto));
     }
 
     @Test
@@ -194,6 +197,7 @@ public class ChatRoomServiceTest {
                 .build();
         chatRoomService.updateChatRoomName(chatRoomUpdateDto);
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .type(ChatMessageDto.MessageType.UPDATE_NAME)
                 .roomId(Long.toString(chatRoom.getId()))
                 .userId(user.getId())
                 .message("채팅방 이름이 변경되었습니다.")
@@ -207,7 +211,7 @@ public class ChatRoomServiceTest {
 
         //then
         assertThat(chatRoom.getRoomName()).isEqualTo(newChatRoomName);
-        verify(kafkaProducerService, times(1)).sendMessage(chatMessageDto);
+        verify(kafkaProducerService, times(1)).objectMapperMessage(eq(chatMessageDto));
     }
 
 }

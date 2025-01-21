@@ -144,6 +144,8 @@ public class ChatControllerTest {
     @Test
     @DisplayName("유저가 채팅방에 구독하면 메시지를 발행하고 수신할 수 있다")
     public void redis_websocket_publish() throws Exception {
+        // 현재 테스트는 Redis Pub/Sub 환경이 아닌 WebSocket + Stomp 환경에서 검사만 진행 (추후 Kafka로 변경 예정이므로)
+
         // RedisPublisher를 통해 메시지를 발행할 수 있도록 설정
         String message = "Hello from WebSocket!";
         String roomId = "1L";
