@@ -1,17 +1,33 @@
-version: '3.8'
 services:
-  zookeeper:
-    image: wurstmeister/zookeeper:latest
-    container_name: zookeeper
+  zookeeper-0:
+    image: bitnami/zookeeper:3.9.2
+    container_name: zookeeper-0
     ports:
-      - "2181:2181"
-  kafka:
-    image: wurstmeister/kafka:latest
-    container_name: kafka
-    ports:
-      - "9092:9092"
+      - 2181:2181
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ALLOW_ANONYMOUS_LOGIN: yes
+
+  kafka-0:
+    image: bitnami/kafka:3.7.0
+    container_name: kafka-0
+    ports:
+      - 9094:9094
+    environment:
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_ENABLE_KRAFT: no #Kraft 모드를 사용하지 않고, Zookeeper 모드를 사용
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper-0:2181
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,EXTERNAL://:9094 #Kafka 브로커가 수신 대기할 주소와 포트를 설정
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka-0:9092,EXTERNAL://localhost:9094 #Kafka 브로커가 클라이언트에게 알리는 주소를 설정
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT #각 리스너가 사용할 보안 프로토콜 설정
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    container_name: kafka-ui
+    depends_on:
+      - kafka-0
+    ports:
+      - 8080:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-0:9092
